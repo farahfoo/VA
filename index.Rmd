@@ -1,0 +1,14 @@
+---
+title: "Visual Analytics"
+description: |
+  Welcome to the website created in MITB ISSS608 Visual Analytics class.
+site: distill::distill_website
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+# Learn more about creating websites with Distill at:
+# https://rstudio.github.io/distill/website.html
+```
+

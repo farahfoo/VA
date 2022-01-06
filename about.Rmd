@@ -1,0 +1,10 @@
+---
+title: "About this site"
+description: |
+  This website shows the visual projects done as part of MITB ISSS608.
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
