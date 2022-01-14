@@ -17,8 +17,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # 1.0 Overview
 
-**Correlation coefficient** is a popular statistic that use to measure the type and strength of the relationship between two variables.  The values of a correlation coefficient ranges between -1.0 and 1.0.  A correlation coefficient of 1 shows a perfect linear relationship between the two variables, while a -1.0 shows a perfect inverse relationship between the two variables.  A correlation coeficient of 0.0 shows no linear relationship between the two variables. 
-
+**pending exercise** due on 23 Jan 2359
 
 
 
