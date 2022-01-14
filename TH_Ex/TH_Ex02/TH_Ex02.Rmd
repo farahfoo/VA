@@ -1,0 +1,25 @@
+---
+title: "Take-home Exercise 2"
+description: |
+  A new article created using the Distill format.
+author:
+  - name: Frostbear 
+    url: https://sg.linkedin.com/in/farahfoo
+    affiliation: SMU Masters in IT business (Fintech and Analytics)
+    affiliation_url: https://scis.smu.edu.sg/master-it-business
+date: "`r Sys.Date()`"
+output: distill::distill_article
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# 1.0 Overview
+
+**Correlation coefficient** is a popular statistic that use to measure the type and strength of the relationship between two variables.  The values of a correlation coefficient ranges between -1.0 and 1.0.  A correlation coefficient of 1 shows a perfect linear relationship between the two variables, while a -1.0 shows a perfect inverse relationship between the two variables.  A correlation coeficient of 0.0 shows no linear relationship between the two variables. 
+
+
+
+
+
