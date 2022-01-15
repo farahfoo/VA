@@ -62,9 +62,7 @@ for(p in packages){
 exam_data <-read_csv("data/Exam_data.csv")
 summary(exam_data)
 ```
-
 * using read.csv instead of read_csv may result in messy column names
-
 
 # Visualisation using ggplot2 package
 
