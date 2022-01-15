@@ -22,4 +22,8 @@ navbar:
         href: "DataViz_Makeover/DataViz1.html"
       - text: "DataViz 2"
         href: "DataViz_Makeover/DataViz2.html"
+    - text: "In-class Exercise"
+      menu:
+      - text: "In-class exercise 1"
+        href: "in_Class_ex/In-class_Ex01/inclass-exercise-01.html"
 output: distill::distill_article
