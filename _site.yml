@@ -21,5 +21,5 @@ navbar:
       - text: "DataViz 1"
         href: "DataViz_Makeover/DataViz1.html"
       - text: "DataViz 2"
-        href: DataViz2.html
+        href: "DataViz_Makeover/DataViz2.html"
 output: distill::distill_article

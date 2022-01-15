@@ -1,0 +1,184 @@
+---
+title: "In-class exercise 01: Intro to R and ggplot2"
+description: |
+  15th Jan 2022 - Intro to R and ggplot
+author:
+  - name: Farah
+    url: https://sg.linkedin.com/in/farahfoo
+    affiliation: SMU Masters in IT business (Fintech and Analytics)
+    affiliation_url: https://scis.smu.edu.sg/master-it-business
+date: "`r Sys.Date()`"
+output: distill::distill_article
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  cache = FALSE,
+  message = FALSE,
+  fig.retina = 3,
+  warning = FALSE)
+
+```
+# NOTES FROM LECTURE TODAY
+Below is the Data science workflow with Tidyverse from [R for Data Science](https://r4ds.had.co.nz/) 
+
+*Import --> Tidy --> transform --> visualise <--> model --> communicate*
+
+* Import (readr, haven, readxl)
+* Tidy (tidyr)
+* transform (dplyr)
+* Visualise (purr, ggplot2)
+* Model (broom)
+* communicate (knitr, rmarkdown)
+* others
+  + Dealing with Factors (forcats)
+  + Dealing with data.frames (tibble)
+  + Dealing with string (stringr)
+
+*use r cheatsheets to get the syntax*
+
+# Pike %>% - super important connector
+
+# Installing and loading required libraries
+
+* Loading multiple packages at one go
+
+```{r echo = TRUE}  
+packages = c('ggplot2', 'tidyverse', 'ggrepel')
+
+for(p in packages){
+  if(!require(p, character.only = T)){
+    install.packages(p)
+  }
+  library(p, character.only = T)
+}
+```
+
+# Importing data into R
+
+* Data should be same level as the rmarkdown file to use the relative file path below
+```{r echo = TRUE}  
+exam_data <-read_csv("data/Exam_data.csv")
+summary(exam_data)
+```
+
+* using read.csv instead of read_csv may result in messy column names
+
+
+# Visualisation using ggplot2 package
+
+* ggplot2 is used for Visual Data exploration purpose
+
+* using R graphics to plot histogram vs using ggplot. 
+```{r echo = TRUE}  
+hist(exam_data$MATHS)
+```
+
+Note the longer coding but more powerful customisation
+
+```{r echo = TRUE}  
+ggplot(data=exam_data, 
+       aes(x = MATHS)) + 
+  geom_histogram(bins=10,
+                boundary = 100,
+                colour = "black",
+                  fill="grey") +
+        ggtitle("Distribution of Maths scores") 
+```
+## GGPLOT2 elements
+* Data
+* Aesthetics (aes =df$variablename)
+* Geometrics (bar or pie or line or histogram)
+* Facets (columns x rows eg. 2 x 5) / grids
+* statistics (sum, average etc..)
+* Coordinates (x and Y axis)
+* Theme (colour/ format of the graph)
+
+Note that the default grom_histogram default bin is 30
+
+### adding theme
+
+```{r echo = TRUE}  
+ggplot(data=exam_data, 
+       aes(x = MATHS)) + 
+  geom_histogram(bins=10,
+                boundary = 100,
+                colour = "black",
+                  fill="grey") +
+        ggtitle("Distribution of Maths scores") +
+  theme_dark()
+```
+
+### adding facet
+```{r echo = TRUE}  
+ggplot(data=exam_data, 
+       aes(x = MATHS)) + 
+  geom_histogram(bins=10,
+                boundary = 100,
+                colour = "black",
+                  fill="blue") +
+        ggtitle("Distribution of Maths scores") +
+  facet_grid(cols = vars(RACE))
+```
+
+###  putting GENDER variable as a fill filter
+```{r echo = TRUE}
+ggplot(data=exam_data, 
+       aes(x = MATHS,
+       fill = GENDER)) + 
+  geom_histogram(bins=10,
+                boundary = 100,
+                colour = "black") +
+        ggtitle("Distribution of Maths scores") +
+  facet_grid(cols = vars(RACE))
+
+```
+
+###  putting GENDER variable as a fill filter
+```{r echo = TRUE}
+ggplot(data=exam_data, 
+       aes(y = MATHS,
+       x = GENDER)) + 
+  geom_boxplot(notch = TRUE)
+
+```
+
+###  combining boxplot and geompoint together 
+```{r echo = TRUE}
+ggplot(data=exam_data, 
+       aes(y = MATHS,
+       x = GENDER)) + 
+  geom_boxplot() +
+  geom_point(position = "jitter",
+             size = 0.5)
+
+```
+
+###  volin plot is good to compliment boxplot, got error - cannot find dunction geom_volin 
+####```{r echo = TRUE}
+ggplot(data=exam_data, 
+       aes(y = MATHS,
+       x = GENDER)) + 
+  geom_boxplot(alpha = 0.5) +
+  geom_volin (fill = "light blue")
+
+####```
+###  note the 2 syntax below gives the same result though the code is different.
+```{r echo = TRUE}
+ggplot(data=exam_data, 
+       aes(y = MATHS, x = GENDER)) + 
+  geom_boxplot() +
+  geom_point (stat = "summary",
+              fun.y = "mean",
+              colour = "red",
+              size = 4)
+
+ggplot(data=exam_data, 
+       aes(y = MATHS, x = GENDER)) + 
+  geom_boxplot() +
+  stat_summary (geom = "point",
+                fun.y = "mean",
+              colour = "red",
+              size = 4)
+```
