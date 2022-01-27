@@ -1,0 +1,63 @@
+---
+title: "Take-home Exercise 2 - Age-sex Pyramid"
+description: |
+  Class notes and exercise
+author:
+  - name: Frostbear 
+    url: https://sg.linkedin.com/in/farahfoo
+    affiliation: SMU Masters in IT business (Fintech and Analytics)
+    affiliation_url: https://scis.smu.edu.sg/master-it-business
+date: "`r Sys.Date()`"
+output: distill::distill_article
+---
+
+# Installing and loading package
+
+```{r echo = TRUE}  
+packages = c('tidyverse', 'readxl', 'ggthemes')
+
+for(p in packages){library
+  if(!require(p, character.only = T)){
+    install.packages(p)
+  }
+  library(p, character.only = T)
+}
+```
+
+# Loading data 
+```{r echo = TRUE, warning = FALSE, mesage = FALSE}
+pop_data <- read_csv("data/respopagesextod2021.csv")
+glimpse (data)
+
+
+```
+
+# Summarising data 
+```{r echo = TRUE, warning = FALSE, mesage = FALSE}
+
+cut_data <- pop_data %>%
+  select(c("AG","Sex","Pop"))
+
+summary_sex <- pop_data %>%
+  group_by(AG, Sex) %>%
+  summarise(Pop = sum(Pop)) %>%
+  ungroup()
+
+head (summary_sex,5)
+```
+
+
+# Plotting double geom_bar Age-sex pyramid
+```{r echo = TRUE, warning = FALSE, mesage = FALSE}
+
+ggplot(summary_sex, aes(x=AG)) +
+  geom_bar(data=summary_sex[summary_sex$Sex=="Males",], aes(y=Pop*-1), stat="identity", fill="blue") +
+  geom_bar(data=summary_sex[summary_sex$Sex=="Females",], aes(y=Pop), stat="identity", fill="pink") +
+  geom_hline(yintercept=0, colour="white", lwd=1)+
+coord_flip () +
+scale_y_continuous(breaks = seq(-160000,160000,40000)) +
+  labs(y="Population", x="Gender") +
+  ggtitle("                        Male                                                Female")
+
+
+```
