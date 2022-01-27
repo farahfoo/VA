@@ -110,22 +110,4 @@ The code chunks used to create the data visualisation consists of two main parts
 
 Next, the *ggarrange* function of **ggpur** package is used to group these histograms together.
 
-# NOTES FROM LECTURE TODAY
-Below is the Data science workflow with Tidyverse from [R for Data Science](https://r4ds.had.co.nz/) 
-
-*Import --> Tidy --> transform --> visualise <--> model --> communicate*
-
-* Import (readr, haven, readxl)
-* Tidy (tidyr)
-* transform (dplyr)
-* Visualise (purr, ggplot2)
-* Model (broom)
-* communicate (knitr, rmarkdown)
-* others
-  + Dealing with Factors (forcats)
-  + Dealing with data.frames (tibble)
-  + Dealing with string (stringr)
-
-# pike %>%
-
 

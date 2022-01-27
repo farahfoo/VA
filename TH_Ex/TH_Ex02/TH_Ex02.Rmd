@@ -1,7 +1,7 @@
 ---
 title: "Take-home Exercise 2"
 description: |
-  A new article created using the Distill format.
+  Class notes and exercise
 author:
   - name: Frostbear 
     url: https://sg.linkedin.com/in/farahfoo
@@ -16,9 +16,112 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 # 1.0 Overview
+![Data science R tools](C:/farahfoo/VA/pictures/datascience.png)
 
-**pending exercise** due on 23 Jan 2359
+To load packages required today:
+
+```{r echo = TRUE}  
+packages = c('tidyverse', 'readxl', 'ggthemes')
+
+for(p in packages){library
+  if(!require(p, character.only = T)){
+    install.packages(p)
+  }
+  library(p, character.only = T)
+}
+```
+Read more about [readxl](https://readxl.tidyverse.org/) here. 
+
+```{r echo = TRUE, warning = FALSE, mesage = FALSE}
+orders <- read_xls("data/Superstore-2021.xls",
+                  sheet = "Orders")
+glimpse (orders)
+
+returns <- read_xls("data/Superstore-2021.xls",
+                  sheet = "Returns")
+
+glimpse (returns)
+```
+## dplyr package for data manipulation
+
+Key functions / syntax: Summarise, mutate, select, filter
+
+* select() - to select variables based on their names.
+* filter() - to select cases based on their values."|" = or. 
+* arrange() - to reorder the cases.
+* mutate() and transmute() to add new variables that are functions of existing variables.
+* group_by() - allows for group operations in the "split-apply-combine" concept
+* summarise() - to condense multiple values to a single value.
+* join() - to join to table using unique identifiers from the join tables.
+
+### Combining 2 tabs
+```{r echo = TRUE, warning = FALSE, mesage = FALSE}
+joined_tab <-left_join(returns, orders,
+                       by = c('Order ID' = "Order ID"))
+head (joined_tab,2)
+```
+
+### Compute frequency count by sub-category
+Check variable name using glimpse function. 2 methods below, Group-by and count. 
+
+```{r echo = TRUE, warning = FALSE, mesage = FALSE}
+
+freq_returned <- joined_tab %>%
+  group_by(`Sub-Category`) %>%
+  summarise(Returns = n()) %>%
+  ungroup()
+
+head (freq_returned,2)
+
+
+freq_returned <- joined_tab %>% 
+  count(`Sub-Category`) %>%
+  rename(Returns = n)
+
+head (freq_returned,2)
+
+```
 
 
 
 
+* Arrange table values by descending order
+
+```{r echo = TRUE, warning = FALSE, mesage = FALSE}
+freq_sorted <- freq_returned %>%
+  arrange(desc(Returns))
+
+head(freq_sorted,2)
+tail(freq_sorted,2)
+```
+
+* Creating new cumulative column
+
+```{r echo = TRUE, warning = FALSE, mesage = FALSE}
+freq_cum <- freq_sorted %>%
+  mutate(cumfreq = cumsum(Returns))
+
+head(freq_cum)
+```
+
+
+*Plotting the 2 columns Returns and cumulative
+
+```{r echo = TRUE, fig.width=10, fig.height=5}
+
+ggplot(freq_cum)+ aes(x=reorder(`Sub-Category`, cumfreq)) +
+  geom_bar(aes(y = Returns),stat="identity", fill="tan1", colour="sienna3") +
+ geom_line(aes(y = cumfreq, group = 1),stat="identity") +
+  scale_y_continuous(
+  # Features of the first axis
+    name = "Number of Returns",
+    # Add a second axis and specify its features
+   #sec.axis = sec_axis(~./100000*100, name="Second Axis"))
+   sec.axis = sec_axis(~./(sum(freq_cum$Returns))*100, name="Cumulative % of returns")) +
+  
+  labs(title = "Pareto Chart for returns", x = "Sub-Category")+
+  
+  theme_economist()
+
+
+```
