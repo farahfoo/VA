@@ -1,7 +1,7 @@
 ---
-title: "Take-home Exercise 2"
+title: "Take-home Exercise 2 - Pareto Chart"
 description: |
-  Class notes and exercise
+  Class notes and Pareto Chart exercise
 author:
   - name: Frostbear 
     url: https://sg.linkedin.com/in/farahfoo
@@ -125,3 +125,10 @@ ggplot(freq_cum)+ aes(x=reorder(`Sub-Category`, cumfreq)) +
 
 
 ```
+
+
+
+
+
+
+
