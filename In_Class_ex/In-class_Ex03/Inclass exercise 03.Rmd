@@ -1,0 +1,38 @@
+---
+title: "In class exericse 03 "
+description: |
+  Class notes and Pareto Chart exercise
+author:
+  - name: Frostbear 
+    url: https://sg.linkedin.com/in/farahfoo
+    affiliation: SMU Masters in IT business (Fintech and Analytics)
+    affiliation_url: https://scis.smu.edu.sg/master-it-business
+date: "`r Sys.Date()`"
+output: distill::distill_article
+---
+
+
+
+# Using Tableau to create visualisations with time filters
+![Data science R tools](C:/farahfoo/VA/In_Class_ex/In-class_Ex03/Tableau1.png)
+
+
+# Adding Chart as a tooltip
+![Data science R tools](C:/farahfoo/VA/In_Class_ex/In-class_Ex03/Tableau2.png)
+
+# Exam marks as Scatter and box plot
+
+* Change size on dashboard to automatic
+* Add blank boxes to manually adjust the 3 graphs to align
+* Add the coordinated link view through Dashboard --> actions --> add actions --> select highlight function
+* you can also set the data to filter instead of highlight
+
+![Data science R tools](C:/farahfoo/VA/In_Class_ex/In-class_Ex03/Tableau3.png)
+
+# Bubbleplots plots on population with auto moving year
+![Data science R tools](C:/farahfoo/VA/In_Class_ex/In-class_Ex03/Tableau4.png)
+
+
+
+
+

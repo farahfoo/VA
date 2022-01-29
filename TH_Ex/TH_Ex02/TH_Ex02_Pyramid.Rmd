@@ -43,6 +43,7 @@ summary_sex <- pop_data %>%
   summarise(Pop = sum(Pop)) %>%
   ungroup()
 
+
 head (summary_sex,5)
 ```
 
