@@ -16,7 +16,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 # 1.0 Overview
-![Data science R tools](C:/farahfoo/VA/pictures/datascience.png)
+![Data science R tools](C:/farahfoo/VA/pictures/datascience.JPG)
 
 To load packages required today:
 
@@ -109,7 +109,7 @@ head(freq_cum)
 
 ```{r echo = TRUE, fig.width=10, fig.height=5}
 
-ggplot(freq_cum)+ aes(x=reorder(`Sub-Category`, cumfreq)) +
+ggplot(freq_cum) + aes(x=reorder(`Sub-Category`, cumfreq)) +
   geom_bar(aes(y = Returns),stat="identity", fill="tan1", colour="sienna3") +
  geom_line(aes(y = cumfreq, group = 1),stat="identity") +
   scale_y_continuous(

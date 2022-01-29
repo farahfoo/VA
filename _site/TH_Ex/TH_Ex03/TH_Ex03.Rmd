@@ -11,15 +11,174 @@ date: "`r Sys.Date()`"
 output: distill::distill_article
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE)
+
+To load packages required today:
+
+```{r echo = TRUE}  
+packages = c('tidyverse', 'readxl', 'ggthemes', 'ggiraph', 'plotly', 
+             'gganimate', 'patchwork', 'DT', 'gifski', 'gapminder')
+
+for(p in packages){
+  if(!require(p, character.only = T)){
+    install.packages(p)
+  }
+  library(p, character.only = T)
+}
+
+exam_data <- read_csv("data/Exam_data.csv")
+head(exam_data,5)
 ```
 
-Distill is a publication format for scientific and technical writing, native to the web. 
 
-Learn more about using Distill for R Markdown at <https://rstudio.github.io/distill>.
+```{r echo = TRUE}  
+p <- ggplot(data=exam_data,
+aes(x = MATHS)) + 
+geom_dotplot_interactive(
+aes(tooltip = ID),
+stackgroups = TRUE,
+binwidth =1,
+method = "histodot") +
+scale_y_continuous(NULL, breaks = NULL)
+
+
+girafe(ggobj = p,
+width_svg = 6,
+height_svg = 6*0.618)
+
+```
+
+
+# changing the mouse-over to show associated elements
+```{r echo = TRUE}  
+
+colnames (exam_data)
+
+p <- ggplot(data=exam_data,
+aes(x = MATHS)) + 
+geom_dotplot_interactive(aes(data_id = CLASS),
+stackgroups = TRUE, binwidth =1, method = "histodot") +
+scale_y_continuous(NULL, breaks = NULL)
+  #hover_css = "fill: blue"
+
+
+girafe(ggobj = p,
+width_svg = 6,
+height_svg = 6*0.618)
+
+```
 
 
 
+# varying more of the mouse-over colours
+```{r echo = TRUE}  
 
+head(p,2)
+
+colnames (exam_data)
+
+p <- ggplot(data=exam_data,
+aes(x = MATHS)) + 
+geom_dotplot_interactive(aes(data_id = CLASS),
+stackgroups = TRUE, binwidth =1, method = "histodot") +
+scale_y_continuous(NULL, breaks = NULL)
+  #hover_css = "fill: blue"
+
+
+girafe(ggobj = p,
+width_svg = 6,
+height_svg = 6*0.618,
+options = list(opts_hover(css = "fill: blue"),
+               opts_hover_inv(css = "opacity:0.2;")))
+
+```
+
+# use patchwork to arrange multiple graphs together 
+
+```{r echo = TRUE}  
+
+p1 <- ggplot(data=exam_data,
+aes(x = MATHS)) + 
+geom_dotplot_interactive(aes(data_id = ID),
+stackgroups = TRUE, binwidth =1, method = "histodot") +
+  coord_cartesian (xlim=c(0,100)) +
+scale_y_continuous(NULL, breaks = NULL)
+
+p2 <- ggplot(data=exam_data,
+aes(x = ENGLISH)) + 
+geom_dotplot_interactive(aes(data_id = ID),
+stackgroups = TRUE, binwidth =1, method = "histodot") +
+  coord_cartesian (xlim=c(0,100)) +
+scale_y_continuous(NULL, breaks = NULL)
+
+# girafe(ggobj = print (p1 / p2),
+# width_svg = 6,
+# height_svg = 6,
+# options = list(opts_hover(css = "fill: blue"),
+#                opts_hover_inv(css = "opacity:0.2;")))
+
+```
+
+# Using plot_ly()
+* basic and setting colours
+```{r echo = TRUE}  
+plot_ly(data =exam_data,
+x = ~MATHS,
+y = ~ENGLISH, 
+color = ~RACE,
+colors = "Set1")
+
+setcolour <- c ("red", "blue", "green", "yellow")
+
+plot_ly(data =exam_data,
+x = ~MATHS,
+y = ~ENGLISH, 
+color = ~RACE,
+colors = setcolour)
+```
+
+* setting text to the dots and adding graph headers
+```{r echo = TRUE}  
+plot_ly(data =exam_data,
+x = ~MATHS,
+y = ~ENGLISH,
+text = ~paste("Student ID:", ID, "<br>Class:", CLASS),
+color = ~RACE,
+colors = "Set1") %>%
+  layout(title = 'English vs Maths',
+  xaxis = list(range = c(0,100)),
+  yaxis = list(range = c(0,100)))
+
+```
+
+* or using ggplot
+```{r echo = TRUE}  
+
+graph <- ggplot(exam_data, aes(x= MATHS, y = ENGLISH)) +
+  geom_point(dotsize = 1, color = "blue") +
+  coord_cartesian(xlim=c(0,100), ylim = c(0,100))
+
+ggplotly (graph)  
+```
+
+# Showing data table on selected data points 
+```{r echo = TRUE}  
+
+d <- highlight_key(exam_data)
+graph <- ggplot(d,
+                aes(x= MATHS, y = ENGLISH)) +
+  geom_point(dotsize = 1, color = "blue") +
+  coord_cartesian(xlim=c(0,100), ylim = c(0,100))
+
+graphhighlight <- highlight(ggplotly(graph),
+                  "plotly_selected")
+
+
+library (crosstalk)
+crosstalk::bscols (graphhighlight, 
+               DT::datatable(d), widths = 5)
+
+
+```
+
+# gganimate: transition over time, state, reveal, events, filters, layers
 

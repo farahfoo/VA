@@ -1,13 +1,14 @@
 ---
 title: "Visual Analytics"
 description: |
-  Welcome to the website created in MITB ISSS608 Visual Analytics class.
+  Welcome to the website created in MITB ISSS608 Data Analytics and Visualisation using R and Tableau. 
 site: distill::distill_website
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE)
+This webpage consist of a demonstration of my in-class and take-home exercises and assignments using Rmarkdown distill article template and Tableau.
 
-# Learn more about creating websites with Distill at:
-# https://rstudio.github.io/distill/website.html
-```
+In-class exercises are mostly performed using Tableau.
+Take home exercises are to replicate the same charts using R
+
+
+

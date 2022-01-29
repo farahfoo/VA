@@ -16,7 +16,7 @@ output: distill::distill_article
 ```{r echo = TRUE}  
 packages = c('tidyverse', 'readxl', 'ggthemes')
 
-for(p in packages){library
+for(p in packages){
   if(!require(p, character.only = T)){
     install.packages(p)
   }
