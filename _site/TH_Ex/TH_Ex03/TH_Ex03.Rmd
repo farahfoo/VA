@@ -1,7 +1,7 @@
 ---
-title: "Take-home Exercise 3"
+title: "Take home Exercise 3 - 4 Feb 2022"
 description: |
-  Class notes and Pareto Chart exercise
+  Animation of graphs in R
 author:
   - name: Frostbear 
     url: https://sg.linkedin.com/in/farahfoo
@@ -11,8 +11,214 @@ date: "`r Sys.Date()`"
 output: distill::distill_article
 ---
 
+# Context of Exercise
+Using previous age-sex pyramid based on 2021 data, to apply appropriate interactivity and animation methods to design an age-sex pyramid based data visualisation to show the changes of demographic structure of Singapore by age cohort and gender between 2000-2020 at planning area level. The data set used is entitle Singapore Residents by Planning Area / Subzone, Age Group, Sex and Type of Dwelling, June 2000-2010 and Singapore Residents by Planning Area / Subzone, Age Group, Sex and Type of Dwelling, June 2011-2020, from Department of Statistics home page.
 
-To load packages required today:
+
+# Installing and loading packages required for Age-Sex pyramid
+
+```{r echo = TRUE}  
+packages = c('tidyverse', 'readxl', 'ggthemes')
+
+for(p in packages){
+  if(!require(p, character.only = T)){
+    install.packages(p)
+  }
+  library(p, character.only = T)
+}
+```
+
+# Loading data using _csv command
+```{r echo = TRUE, warning = FALSE, message = FALSE}
+pop_data <- read_csv("data/respopagesextod2021.csv")
+glimpse (data)
+
+```
+
+
+# Adding Factor levels to AG field
+
+To sort the age-sex pyramid using Age Group, we need to classify the AG field as Factor
+
+```{r echo = TRUE, warning = FALSE, message = FALSE}
+
+pop_data$AG <- factor(pop_data$AG, levels = unique(pop_data$AG))
+```
+
+
+# Summarising the data into the required buckets
+```{r echo = TRUE, warning = FALSE, message = FALSE}
+
+summary_sex <- pop_data %>%
+  group_by(AG, Sex) %>%
+  summarise(Pop = sum(Pop)) %>%
+  ungroup()
+
+head (summary_sex,5)
+```
+
+
+# Plotting double geom_bar Age-sex pyramid
+```{r echo = TRUE, warning = FALSE, message = FALSE}
+
+ggplot(summary_sex, aes(x=AG)) +
+  geom_bar(data=summary_sex[summary_sex$Sex=="Males",], aes(y=Pop*-1), stat="identity", fill="blue") +
+  geom_bar(data=summary_sex[summary_sex$Sex=="Females",], aes(y=Pop), stat="identity", fill="pink") +
+  geom_hline(yintercept=0, colour="white", lwd=1)+
+coord_flip () +
+scale_y_continuous(breaks = seq(-160000,160000,40000), labels = function(v) ifelse(abs(v)>=1000,paste0(abs(v)/1000, "K"), abs(v))) +
+  labs(y="Population", x="Gender") +
+  ggtitle("                        Male                                                Female")
+
+
+```
+
+# Building base graph for 20 years of population data
+
+For animation of population across time, data source can be found  [here at singstat website](https://www.singstat.gov.sg/find-data/search-by-theme/population/geographic-distribution/latest-data). 
+
+* Download 2 sets of data, 1) year 2000 to 2010, and 2) year 2011 to 2020 and combine into 1 set of data.
+
+* Check if the header has been copied into the data set by finding out the unique time brackets
+
+
+```{r echo = TRUE, warning = FALSE, message = FALSE}
+year2000 <- read_csv("data/respopagesextod2000to2010.csv")
+year2011 <- read_csv("data/respopagesextod2011to2020.csv") 
+
+head (year2000,3)
+head (year2011,3)
+# Since columns are the same, we can combine the 2 files into 1 file for processing
+
+combined <- rbind(year2000,year2011)
+unique(combined$Time)
+
+# in the Time column, there are only numbers, hence the row header was not copied into the data
+```
+
+# Adding Factor levels to Age group field
+
+To sort the age-sex pyramid using Age Group, we need to classify the AG field as Factor
+
+```{r echo = TRUE, warning = FALSE, message = FALSE}
+
+combined$AG <- factor(combined$AG, levels = unique(combined$AG))
+```
+
+# Summarising data by Age Group, Sex and Time 
+
+To plot the graph over the different years, we need to call out the Time field as a column (variable)
+
+```{r echo = TRUE, warning = FALSE, message = FALSE}
+
+summary_sex_20 <- combined %>%
+  group_by(AG, Sex, Time) %>%
+  summarise(Pop = sum(Pop)) %>%
+  ungroup()
+
+head (summary_sex_20,5)
+```
+
+# Plotting double geom_bar Age-sex pyramid for 20 years
+
+Using the individual Age-sex pyramid from above (plotted for year 2021), we re-use the code to plot out 20 pyramid graphs, 1 graph for each year. 
+
+```{r echo=TRUE, fig.height=20, fig.width=10, message=FALSE, warning=FALSE}
+
+ggplot(summary_sex_20, aes(x=AG)) +
+  geom_bar(data=summary_sex_20[summary_sex_20$Sex=="Males",], aes(y=Pop*-1), stat="identity", fill="blue") +
+  geom_bar(data=summary_sex_20[summary_sex_20$Sex=="Females",], aes(y=Pop), stat="identity", fill="pink") +
+  geom_hline(yintercept=0, colour="white", lwd=1)+
+  
+coord_flip () +
+  
+scale_y_continuous(breaks = seq(-160000,160000,40000), labels = function(v) ifelse(abs(v)>=1000,paste0(abs(v)/1000, "K"), abs(v))) +
+  
+  labs(title = "Age-Sex Population Pyramid, Singapore 2021", 
+   caption = 'Data Source: Department of Statistics (June 2021)',
+   y = "Population", x = "Gender") + 
+  
+  theme_bw() +
+   theme(legend.position = "none")+
+  theme(plot.title = element_text(size=16))+
+  theme(plot.subtitle = element_text(size=12))+
+  
+facet_wrap(. ~ `Time`,ncol=4)
+
+```
+
+It is clear from the 20 graphs displayed, that the difference in population year on year is not clear. To show more clarity, we use the year as base to transition the graph in 1 frame in the next section. 
+
+
+# Using gganimate
+but first, we enhance the graph by 
+
+*adding title
+*caption 
+*theme
+*find out the maximum and minimum values of the population to set the chart axis to ensure all the values will be captured properly.
+
+### Activating gganimate as it will be used for the animation of the age-sex pyramid over the 20 years
+
+We call out the package required which is ggaminate.
+
+```{r echo = TRUE}  
+packages = c('gganimate')
+
+for(p in packages){
+  if(!require(p, character.only = T)){
+    install.packages(p)
+  }
+  library(p, character.only = T)
+}
+```
+
+### Then we find out the max and min values of the population set.
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+max(summary_sex_20$Pop)
+min(summary_sex_20$Pop)
+```
+
+### Improving the existing code by adding the range limits, title, subtitle and theme.
+
+```{r echo=TRUE, fig.height=10, fig.width=10, warning = FALSE, message = FALSE}
+
+SG20 <- ggplot(summary_sex_20, aes(x=AG,colour=Sex,fill=Sex)) +
+  geom_bar(data=summary_sex_20[summary_sex_20$Sex=="Males",], aes(y=Pop*-1), stat="identity") +
+  geom_bar(data=summary_sex_20[summary_sex_20$Sex=="Females",], aes(y=Pop), stat="identity") +
+  geom_hline(yintercept=0, colour="white", lwd=1) +
+  
+coord_flip() +
+  
+scale_y_continuous(limits = c(-170000, 170000), n.breaks = 10, labels = function(v) ifelse(abs(v)>= 1000,paste0(abs(v)/1000, "K"), abs(v))) +
+  
+  labs(title = "Singapore Age-Sex Population Pyramid for 20 years",
+    subtitle = 'Year: "{round(frame_time, 0)}"',
+    caption = 'Data Source: Department of Statistics (June 2000 to June 2020)',
+  y = 'Male and Female Population',
+  x = 'Age Group') +
+  
+  theme_bw () +
+   theme(legend.text = element_text(size=12))+
+  theme(plot.title = element_text(size=16))+
+  theme(plot.subtitle = element_text(size=10))
+
+SG20
+
+```
+
+
+### Animating the age-sex pyramid 
+```{r echo=TRUE, fig.height=10, fig.width=10, warning = FALSE, message = FALSE}
+
+SG20 +
+transition_time(Time) +
+ease_aes('linear')
+
+```
+### Interactive plots
+
+Loading packages for interactive plots
 
 ```{r echo = TRUE}  
 packages = c('tidyverse', 'readxl', 'ggthemes', 'ggiraph', 'plotly', 
@@ -24,161 +230,86 @@ for(p in packages){
   }
   library(p, character.only = T)
 }
-
-exam_data <- read_csv("data/Exam_data.csv")
-head(exam_data,5)
 ```
+# Creating new data set for interactive plots
+```{r echo = TRUE, warning = FALSE, message = FALSE}
 
+interactive_data <- combined %>%
+  spread (Sex, sum(Pop)) %>% 
+  mutate(Total = Females + Males) %>% 
+  group_by(Time, AG) %>% 
+  summarise(Female = sum(Females), Male =sum(Males), Total = sum(Total))
 
-```{r echo = TRUE}  
-p <- ggplot(data=exam_data,
-aes(x = MATHS)) + 
-geom_dotplot_interactive(
-aes(tooltip = ID),
-stackgroups = TRUE,
-binwidth =1,
-method = "histodot") +
-scale_y_continuous(NULL, breaks = NULL)
-
-
-girafe(ggobj = p,
-width_svg = 6,
-height_svg = 6*0.618)
-
-```
-
-
-# changing the mouse-over to show associated elements
-```{r echo = TRUE}  
-
-colnames (exam_data)
-
-p <- ggplot(data=exam_data,
-aes(x = MATHS)) + 
-geom_dotplot_interactive(aes(data_id = CLASS),
-stackgroups = TRUE, binwidth =1, method = "histodot") +
-scale_y_continuous(NULL, breaks = NULL)
-  #hover_css = "fill: blue"
-
-
-girafe(ggobj = p,
-width_svg = 6,
-height_svg = 6*0.618)
-
-```
-
-
-
-# varying more of the mouse-over colours
-```{r echo = TRUE}  
-
-head(p,2)
-
-colnames (exam_data)
-
-p <- ggplot(data=exam_data,
-aes(x = MATHS)) + 
-geom_dotplot_interactive(aes(data_id = CLASS),
-stackgroups = TRUE, binwidth =1, method = "histodot") +
-scale_y_continuous(NULL, breaks = NULL)
-  #hover_css = "fill: blue"
-
-
-girafe(ggobj = p,
-width_svg = 6,
-height_svg = 6*0.618,
-options = list(opts_hover(css = "fill: blue"),
-               opts_hover_inv(css = "opacity:0.2;")))
-
-```
-
-# use patchwork to arrange multiple graphs together 
-
-```{r echo = TRUE}  
-
-p1 <- ggplot(data=exam_data,
-aes(x = MATHS)) + 
-geom_dotplot_interactive(aes(data_id = ID),
-stackgroups = TRUE, binwidth =1, method = "histodot") +
-  coord_cartesian (xlim=c(0,100)) +
-scale_y_continuous(NULL, breaks = NULL)
-
-p2 <- ggplot(data=exam_data,
-aes(x = ENGLISH)) + 
-geom_dotplot_interactive(aes(data_id = ID),
-stackgroups = TRUE, binwidth =1, method = "histodot") +
-  coord_cartesian (xlim=c(0,100)) +
-scale_y_continuous(NULL, breaks = NULL)
-
-# girafe(ggobj = print (p1 / p2),
-# width_svg = 6,
-# height_svg = 6,
-# options = list(opts_hover(css = "fill: blue"),
-#                opts_hover_inv(css = "opacity:0.2;")))
-
-```
-
-# Using plot_ly()
-* basic and setting colours
-```{r echo = TRUE}  
-plot_ly(data =exam_data,
-x = ~MATHS,
-y = ~ENGLISH, 
-color = ~RACE,
-colors = "Set1")
-
-setcolour <- c ("red", "blue", "green", "yellow")
-
-plot_ly(data =exam_data,
-x = ~MATHS,
-y = ~ENGLISH, 
-color = ~RACE,
-colors = setcolour)
-```
-
-* setting text to the dots and adding graph headers
-```{r echo = TRUE}  
-plot_ly(data =exam_data,
-x = ~MATHS,
-y = ~ENGLISH,
-text = ~paste("Student ID:", ID, "<br>Class:", CLASS),
-color = ~RACE,
-colors = "Set1") %>%
-  layout(title = 'English vs Maths',
-  xaxis = list(range = c(0,100)),
-  yaxis = list(range = c(0,100)))
-
-```
-
-* or using ggplot
-```{r echo = TRUE}  
-
-graph <- ggplot(exam_data, aes(x= MATHS, y = ENGLISH)) +
-  geom_point(dotsize = 1, color = "blue") +
-  coord_cartesian(xlim=c(0,100), ylim = c(0,100))
-
-ggplotly (graph)  
-```
-
-# Showing data table on selected data points 
-```{r echo = TRUE}  
-
-d <- highlight_key(exam_data)
-graph <- ggplot(d,
-                aes(x= MATHS, y = ENGLISH)) +
-  geom_point(dotsize = 1, color = "blue") +
-  coord_cartesian(xlim=c(0,100), ylim = c(0,100))
-
-graphhighlight <- highlight(ggplotly(graph),
-                  "plotly_selected")
-
-
-library (crosstalk)
-crosstalk::bscols (graphhighlight, 
-               DT::datatable(d), widths = 5)
+head (interactive_data,5)
 
 
 ```
 
-# gganimate: transition over time, state, reveal, events, filters, layers
+```{r echo=TRUE, warning = FALSE, message = FALSE}
+
+p1 <- ggplot (data= interactive_data,
+        aes(x = Time, 
+            y = Total)) + 
+  geom_point(dotsize = 1) 
+  
+  p1
+```
+
+
+
+
+
+
+
+```{r echo=TRUE, warning = FALSE, message = FALSE}
+
+p2 <- ggplot (data= interactive_data,
+        aes(x = Female,
+            y = Male,
+            colour = AG)) + 
+  geom_point(size = 1)
+
+p2
+```
+
+# Putting 2 graphs side by side
+```{r echo=TRUE, warning = FALSE, message = FALSE}
+
+
+d <- highlight_key(interactive_data)
+
+p1 <- ggplot (data= d,
+        aes(x = Time, y = Total)) + 
+  geom_col()
+
+
+p2 <- ggplot (data= d,
+        aes(x = Female,
+            y = Male,
+            colour = AG)) + 
+  geom_point(size = 1)
+
+subplot (ggplotly (p1),
+         ggplotly (p2))
+
+
+```
+
+# Linking graph with data table using crosstalk
+```{r echo=TRUE, warning = FALSE, message = FALSE}
+
+p1 <- ggplot (data= d,
+        aes(x = Female,
+            y = Male,
+            colour = AG)) + 
+  geom_point(size = 1)
+
+gg <- highlight(ggplotly(p1),
+                "plotly_selected")
+
+crosstalk::bscols(gg,
+                  DT::datatable(d),
+                  widths = 5)
+
+```
 

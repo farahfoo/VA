@@ -31,7 +31,114 @@ output: distill::distill_article
 
 # Bubbleplots plots on population with auto moving year
 ![Data science R tools](C:/farahfoo/VA/In_Class_ex/In-class_Ex03/Tableau4.png)
+# USING R FOR GRAPHS
 
+
+To load packages required today:
+
+```{r echo = TRUE}  
+packages = c('tidyverse', 'readxl', 'ggthemes', 'ggiraph', 'plotly', 
+             'gganimate', 'patchwork', 'DT', 'gifski', 'gapminder')
+
+for(p in packages){
+  if(!require(p, character.only = T)){
+    install.packages(p)
+  }
+  library(p, character.only = T)
+}
+
+exam_data <- read_csv("data/Exam_data.csv")
+head(exam_data,5)
+```
+
+
+```{r echo = TRUE}  
+p <- ggplot(data=exam_data,
+aes(x = MATHS)) + 
+geom_dotplot_interactive(
+aes(tooltip = ID),
+stackgroups = TRUE,
+binwidth =1,
+method = "histodot") +
+scale_y_continuous(NULL, breaks = NULL)
+
+
+girafe(ggobj = p,
+width_svg = 6,
+height_svg = 6*0.618)
+
+```
+
+
+# changing the mouse-over to show associated elements
+```{r echo = TRUE}  
+
+colnames (exam_data)
+
+p <- ggplot(data=exam_data,
+aes(x = MATHS)) + 
+geom_dotplot_interactive(aes(data_id = CLASS),
+stackgroups = TRUE, binwidth =1, method = "histodot") +
+scale_y_continuous(NULL, breaks = NULL)
+  #hover_css = "fill: blue"
+
+
+girafe(ggobj = p,
+width_svg = 6,
+height_svg = 6*0.618)
+
+```
+
+
+
+# varying more of the mouse-over colours
+```{r echo = TRUE}  
+
+head(p,2)
+
+colnames (exam_data)
+
+p <- ggplot(data=exam_data,
+aes(x = MATHS)) + 
+geom_dotplot_interactive(aes(data_id = CLASS),
+stackgroups = TRUE, binwidth =1, method = "histodot") +
+scale_y_continuous(NULL, breaks = NULL)
+  #hover_css = "fill: blue"
+
+
+girafe(ggobj = p,
+width_svg = 6,
+height_svg = 6*0.618,
+options = list(opts_hover(css = "fill: blue"),
+               opts_hover_inv(css = "opacity:0.2;")))
+
+```
+
+# use patchwork to arrange multiple graphs together 
+
+```{r echo = TRUE}  
+
+p1 <- ggplot(data=exam_data,
+aes(x = MATHS)) + 
+geom_dotplot_interactive(aes(data_id = ID),
+stackgroups = TRUE, binwidth =1, method = "histodot") +
+  coord_cartesian (xlim=c(0,100)) +
+scale_y_continuous(NULL, breaks = NULL)
+
+p2 <- ggplot(data=exam_data,
+aes(x = ENGLISH)) + 
+geom_dotplot_interactive(aes(data_id = ID),
+stackgroups = TRUE, binwidth =1, method = "histodot") +
+  coord_cartesian (xlim=c(0,100)) +
+scale_y_continuous(NULL, breaks = NULL)
+
+# girafe(ggobj = print (p1 / p2),
+# width_svg = 6,
+# height_svg = 6,
+# options = list(opts_hover(css = "fill: blue"),
+#                opts_hover_inv(css = "opacity:0.2;")))
+
+```
 
 
 
