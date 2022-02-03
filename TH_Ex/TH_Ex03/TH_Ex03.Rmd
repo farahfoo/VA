@@ -88,10 +88,13 @@ year2011 <- read_csv("data/respopagesextod2011to2020.csv")
 
 head (year2000,3)
 head (year2011,3)
+
 # Since columns are the same, we can combine the 2 files into 1 file for processing
 
 combined <- rbind(year2000,year2011)
 unique(combined$Time)
+
+# write_csv(combined, "combined.csv")
 
 # in the Time column, there are only numbers, hence the row header was not copied into the data
 ```
@@ -216,7 +219,9 @@ transition_time(Time) +
 ease_aes('linear')
 
 ```
-### Interactive plots
+### Doing Interactive plots
+
+Interactive plots help to us compare the same point across 2 graphs
 
 Loading packages for interactive plots
 
@@ -231,63 +236,66 @@ for(p in packages){
   library(p, character.only = T)
 }
 ```
+
 # Creating new data set for interactive plots
 ```{r echo = TRUE, warning = FALSE, message = FALSE}
 
 interactive_data <- combined %>%
   spread (Sex, sum(Pop)) %>% 
   mutate(Total = Females + Males) %>% 
-  group_by(Time, AG) %>% 
-  summarise(Female = sum(Females), Male =sum(Males), Total = sum(Total))
+  group_by(Time, AG, PA) %>% 
+  filter(PA == c("Ang Mo Kio", "Marine Parade")) %>% 
+  summarise(Female = sum(Females), 
+            Male =sum(Males), 
+            Total = sum(Total)) 
+
+
+interactive_data$AG <- factor(interactive_data$AG, levels = unique(interactive_data$AG))
+
+interactive_data <- interactive_data %>% 
+  mutate(Female_prop = Female / Total*100) %>% 
+    mutate(Male_prop = Male / Total*100) 
 
 head (interactive_data,5)
+
+d <- highlight_key(interactive_data)
 
 
 ```
 
-```{r echo=TRUE, warning = FALSE, message = FALSE}
+```{r echo=TRUE, fig.height=5, fig.width=10, warning = FALSE, message = FALSE}
 
-p1 <- ggplot (data= interactive_data,
+
+
+p1 <- ggplot (data = d,
         aes(x = Time, 
             y = Total)) + 
-  geom_point(dotsize = 1) 
+  geom_col() +
+  labs(title = 'Population across time in 2 Planning areas') +
+facet_wrap(. ~ `PA`)
   
   p1
 ```
 
-
-
-
-
-
-
 ```{r echo=TRUE, warning = FALSE, message = FALSE}
 
-p2 <- ggplot (data= interactive_data,
-        aes(x = Female,
-            y = Male,
-            colour = AG)) + 
-  geom_point(size = 1)
+p2 <- ggplot (data = d,
+        aes(x =AG,
+            y = Total)) + 
+  geom_point() +
+  labs(title = 'Total population across Age group in the Planning areas for 20 years')+
+facet_wrap(. ~ `PA`) +
+coord_flip()
+  
 
 p2
 ```
 
 # Putting 2 graphs side by side
+
+Try clicking on 1 graph to see where the point is on the next graph
+
 ```{r echo=TRUE, warning = FALSE, message = FALSE}
-
-
-d <- highlight_key(interactive_data)
-
-p1 <- ggplot (data= d,
-        aes(x = Time, y = Total)) + 
-  geom_col()
-
-
-p2 <- ggplot (data= d,
-        aes(x = Female,
-            y = Male,
-            colour = AG)) + 
-  geom_point(size = 1)
 
 subplot (ggplotly (p1),
          ggplotly (p2))
@@ -296,20 +304,53 @@ subplot (ggplotly (p1),
 ```
 
 # Linking graph with data table using crosstalk
+
+Try clicking on the table to see where is the point in the graph
+
 ```{r echo=TRUE, warning = FALSE, message = FALSE}
 
-p1 <- ggplot (data= d,
-        aes(x = Female,
-            y = Male,
-            colour = AG)) + 
-  geom_point(size = 1)
+Agegroup_PA <- combined %>% 
+  group_by(AG, PA) %>% 
+  summarise (Pop = sum (Pop))
 
-gg <- highlight(ggplotly(p1),
+d <- highlight_key(Agegroup_PA)
+
+p3 <- ggplot (data = d, aes(x = AG, y = Pop))+ 
+  geom_col () +
+  ggtitle ("Age groups in Singapore's Planning Area",
+subtitle = 'Planning Area: {PA}') +
+  coord_flip()
+
+```
+
+```{r echo=TRUE, fig.height=15, fig.width=10, warning = FALSE, message = FALSE}
+
+gg <- highlight(ggplotly(p3),
                 "plotly_selected")
 
 crosstalk::bscols(gg,
                   DT::datatable(d),
-                  widths = 5)
+                  widths = 20)
 
 ```
 
+# Animating graph by Singapore Planning Area and age group`
+
+Plotting the graph to show the number of population across the age group by Planning area for 20 years (2000 - 2020). 
+
+```{r echo=TRUE, fig.height=15, fig.width=10, message=FALSE, warning=FALSE}
+
+animate1 <- ggplot (Agegroup_PA, aes(x = AG, y = Pop/1000))+ 
+    geom_col () +
+  coord_flip() +
+ggtitle('Planning area: {closest_state}') +
+  labs (x = 'AG',
+        y = 'Population (thousand)') +
+transition_states (PA) +
+  ease_aes('linear') +
+  enter_fade() +
+  exit_fade()
+
+animate(animate1,fps=2)
+
+```
