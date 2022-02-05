@@ -1,0 +1,99 @@
+---
+title: "In class exericse 04 "
+description: |
+  xxxx
+author:
+  - name: Frostbear 
+    url: https://sg.linkedin.com/in/farahfoo
+    affiliation: SMU Masters in IT business (Fintech and Analytics)
+    affiliation_url: https://scis.smu.edu.sg/master-it-business
+date: "`r Sys.Date()`"
+output: distill::distill_article
+---
+
+# Installing and loading packages required for statstical plots
+```{r echo = TRUE}  
+packages = c('tidyverse', 'ggstatsplot', 'ggside', 'ggdist')
+
+for(p in packages){
+  if(!require(p, character.only = T)){
+    install.packages(p)
+  }
+  library(p, character.only = T)
+}
+```
+
+P refer to parametric type of stats approach. See the top shows the mean
+```{r echo = TRUE}  
+exam <- read_csv("data/Exam_data.csv")
+
+set.seed(1234)
+gghistostats(data = exam,
+             x = ENGLISH,
+             type = "p",
+             test.value = 60,
+             xlab = "English scores")
+
+```
+
+NP refer to non-parametric type of stats approach. See the top shows the median
+```{r echo = TRUE}  
+exam <- read_csv("data/Exam_data.csv")
+
+set.seed(1234)
+gghistostats(data = exam,
+             x = ENGLISH,
+             type = "np",
+             test.value = 60,
+             xlab = "English scores")
+
+```
+
+```{r echo = TRUE}  
+set.seed(1234)
+gghistostats(data = exam,
+             x = ENGLISH,
+             type = "np",
+             test.value = 60,
+             xlab = "English scores")
+
+```
+
+# Applying interval bins using base R and plotting as bar stats
+
+```{r echo = TRUE}  
+set.seed(1234)
+
+exam1 <- exam %>% 
+  mutate(maths_bin =
+            cut(MATHS, breaks = c(0,25,50,75,100)))
+
+ggbarstats(exam1,
+           x = maths_bin,
+           y = GENDER)
+
+```
+
+# Approach 2: Loose coupling approach
+
+Using some packages together
+
+```{r echo = TRUE}  
+packages = c('readxl', 'report', 'performance', 'parameters', 'see')
+
+for(p in packages){
+  if(!require(p, character.only = T)){
+    install.packages(p)
+  }
+  library(p, character.only = T)
+}
+```
+
+
+# ggcoefstats() method
+
+
+```{r echo = TRUE}  
+ggcoefstats(model1, 
+            output = "plot")
+```

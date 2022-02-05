@@ -62,3 +62,33 @@ scale_y_continuous(breaks = seq(-160000,160000,40000)) +
 
 
 ```
+
+Since the age-sex pyramid is not showing the age banding in sequential order, we set the AG as factor level and run the graph again
+```{r echo = TRUE, warning = FALSE, message = FALSE}
+order <- c("0_to_4", "5_to_9", "10_to_14", "15_to_19", "20_to_24", "25_to_29", "30_to_34", "35_to_39", "40_to_44", "45_to_49", "50_to_54", "55_to_59", "60_to_64", "65_to_69", "70_to_74", "75_to_79", "80_to_84", "85_to_89", "90_and_over")
+
+summary_sex1 <- summary_sex %>%
+  mutate(AG =  factor(AG, levels = order)) %>%
+  arrange(AG)
+
+head(summary_sex1,5)
+```
+
+Replotting a sorted pyramid
+
+```{r echo = TRUE, warning = FALSE, message = FALSE}
+
+ggplot(summary_sex1, aes(x = AG)) +
+
+  geom_bar(data=summary_sex1[summary_sex1$Sex=="Males",], aes(y=Pop*-1), stat="identity", fill="blue") +
+  
+  geom_bar(data=summary_sex1[summary_sex1$Sex=="Females",], aes(y=Pop), stat="identity", fill="pink") +
+  
+  geom_hline(yintercept=0, colour="white", lwd=1)+
+coord_flip () +
+  
+scale_y_continuous(breaks = seq(-160000,160000,40000)) +
+  labs(y="Population", x="Gender") +
+  ggtitle("                        Male                                                Female")
+
+```

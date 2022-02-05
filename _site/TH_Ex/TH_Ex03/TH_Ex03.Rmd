@@ -35,19 +35,8 @@ glimpse (data)
 
 ```
 
-
-# Adding Factor levels to AG field
-
-To sort the age-sex pyramid using Age Group, we need to classify the AG field as Factor
-
-```{r echo = TRUE, warning = FALSE, message = FALSE}
-
-pop_data$AG <- factor(pop_data$AG, levels = unique(pop_data$AG))
-```
-
-
-# Summarising the data into the required buckets
-```{r echo = TRUE, warning = FALSE, message = FALSE}
+# Summarising data 
+```{r echo = TRUE, warning = FALSE, mesage = FALSE}
 
 summary_sex <- pop_data %>%
   group_by(AG, Sex) %>%
@@ -57,25 +46,42 @@ summary_sex <- pop_data %>%
 head (summary_sex,5)
 ```
 
+# Sorting Age group
 
-# Plotting double geom_bar Age-sex pyramid
+To ensure the age group is sorted into the ideal sequence, we set the order we want. 
+
+```{r echo = TRUE, warning = FALSE, message = FALSE}
+order <- c("0_to_4", "5_to_9", "10_to_14", "15_to_19", "20_to_24", "25_to_29", "30_to_34", "35_to_39", "40_to_44", "45_to_49", "50_to_54", "55_to_59", "60_to_64", "65_to_69", "70_to_74", "75_to_79", "80_to_84", "85_to_89", "90_and_over")
+
+summary_sex1 <- summary_sex %>%
+  mutate(AG =  factor(AG, levels = order)) %>%
+  arrange(AG)
+
+head(summary_sex1,5)
+```
+
+# Age-Sex pyramid for 1 year = 2015
+
 ```{r echo = TRUE, warning = FALSE, message = FALSE}
 
-ggplot(summary_sex, aes(x=AG)) +
-  geom_bar(data=summary_sex[summary_sex$Sex=="Males",], aes(y=Pop*-1), stat="identity", fill="blue") +
-  geom_bar(data=summary_sex[summary_sex$Sex=="Females",], aes(y=Pop), stat="identity", fill="pink") +
+ggplot(summary_sex1, aes(x = AG)) +
+
+  geom_bar(data=summary_sex1[summary_sex1$Sex=="Males",], aes(y=Pop*-1), stat="identity", fill="blue") +
+  
+  geom_bar(data=summary_sex1[summary_sex1$Sex=="Females",], aes(y=Pop), stat="identity", fill="pink") +
+  
   geom_hline(yintercept=0, colour="white", lwd=1)+
 coord_flip () +
-scale_y_continuous(breaks = seq(-160000,160000,40000), labels = function(v) ifelse(abs(v)>=1000,paste0(abs(v)/1000, "K"), abs(v))) +
+  
+scale_y_continuous(breaks = seq(-160000,160000,40000)) +
   labs(y="Population", x="Gender") +
   ggtitle("                        Male                                                Female")
-
 
 ```
 
 # Building base graph for 20 years of population data
 
-For animation of population across time, data source can be found  [here at singstat website](https://www.singstat.gov.sg/find-data/search-by-theme/population/geographic-distribution/latest-data). 
+For animation of population across time, data source can be found  [here at singstat website](https://www.singstat.gov.sg/find-data/search-by-theme/population/geographic-distribution/latest-data)
 
 * Download 2 sets of data, 1) year 2000 to 2010, and 2) year 2011 to 2020 and combine into 1 set of data.
 
@@ -99,36 +105,44 @@ unique(combined$Time)
 # in the Time column, there are only numbers, hence the row header was not copied into the data
 ```
 
-# Adding Factor levels to Age group field
+# Sorting Age group
 
-To sort the age-sex pyramid using Age Group, we need to classify the AG field as Factor
+To ensure the age group is sorted into the ideal sequence, we set the order we want. 
 
 ```{r echo = TRUE, warning = FALSE, message = FALSE}
+order <- c("0_to_4", "5_to_9", "10_to_14", "15_to_19", "20_to_24", "25_to_29", "30_to_34", "35_to_39", "40_to_44", "45_to_49", "50_to_54", "55_to_59", "60_to_64", "65_to_69", "70_to_74", "75_to_79", "80_to_84", "85_to_89", "90_and_over")
 
-combined$AG <- factor(combined$AG, levels = unique(combined$AG))
+combined <- combined %>%
+  mutate(AG =  factor(AG, levels = order)) %>%
+  arrange(AG)
+
+head(combined,5)
+
+combined4 <- combined %>% 
+  filter(PA == c("Ang Mo Kio", "Marine Parade", "Punggol", "Bedok")) 
 ```
 
-# Summarising data by Age Group, Sex and Time 
+# Summarising data by Age Group, Sex and Time for 4 Planning areas "Ang Mo Kio", "Marine Parade", "Punggol", "Bedok"
 
 To plot the graph over the different years, we need to call out the Time field as a column (variable)
 
 ```{r echo = TRUE, warning = FALSE, message = FALSE}
 
-summary_sex_20 <- combined %>%
-  group_by(AG, Sex, Time) %>%
+summary_sex_20 <- combined4 %>%
+  group_by(AG, Sex, Time, PA) %>%
   summarise(Pop = sum(Pop)) %>%
   ungroup()
 
 head (summary_sex_20,5)
 ```
 
-# Plotting double geom_bar Age-sex pyramid for 20 years
+# Plotting double geom_bar Age-sex pyramid for 20 years in 4 areas "Ang Mo Kio", "Marine Parade", "Punggol", "Bedok"
 
 Using the individual Age-sex pyramid from above (plotted for year 2021), we re-use the code to plot out 20 pyramid graphs, 1 graph for each year. 
 
 ```{r echo=TRUE, fig.height=20, fig.width=10, message=FALSE, warning=FALSE}
 
-ggplot(summary_sex_20, aes(x=AG)) +
+ggplot(summary_sex_20, aes(x=PA)) +
   geom_bar(data=summary_sex_20[summary_sex_20$Sex=="Males",], aes(y=Pop*-1), stat="identity", fill="blue") +
   geom_bar(data=summary_sex_20[summary_sex_20$Sex=="Females",], aes(y=Pop), stat="identity", fill="pink") +
   geom_hline(yintercept=0, colour="white", lwd=1)+
@@ -137,7 +151,7 @@ coord_flip () +
   
 scale_y_continuous(breaks = seq(-160000,160000,40000), labels = function(v) ifelse(abs(v)>=1000,paste0(abs(v)/1000, "K"), abs(v))) +
   
-  labs(title = "Age-Sex Population Pyramid, Singapore 2021", 
+  labs(title = "Age-Sex Population Pyramid, in 4 key areas 2021", 
    caption = 'Data Source: Department of Statistics (June 2021)',
    y = "Population", x = "Gender") + 
   
@@ -184,7 +198,7 @@ min(summary_sex_20$Pop)
 
 ### Improving the existing code by adding the range limits, title, subtitle and theme.
 
-```{r echo=TRUE, fig.height=10, fig.width=10, warning = FALSE, message = FALSE}
+```{r echo=TRUE, fig.height=15, fig.width=10, warning = FALSE, message = FALSE}
 
 SG20 <- ggplot(summary_sex_20, aes(x=AG,colour=Sex,fill=Sex)) +
   geom_bar(data=summary_sex_20[summary_sex_20$Sex=="Males",], aes(y=Pop*-1), stat="identity") +
@@ -193,9 +207,9 @@ SG20 <- ggplot(summary_sex_20, aes(x=AG,colour=Sex,fill=Sex)) +
   
 coord_flip() +
   
-scale_y_continuous(limits = c(-170000, 170000), n.breaks = 10, labels = function(v) ifelse(abs(v)>= 1000,paste0(abs(v)/1000, "K"), abs(v))) +
+scale_y_continuous(limits = c(-10000, 10000), n.breaks = 10, labels = function(v) ifelse(abs(v)>= 1000,paste0(abs(v)/1000, "K"), abs(v))) +
   
-  labs(title = "Singapore Age-Sex Population Pyramid for 20 years",
+  labs(title = "Singapore Age-Sex Population Pyramid for 20 years in 4 key areas",
     subtitle = 'Year: "{round(frame_time, 0)}"',
     caption = 'Data Source: Department of Statistics (June 2000 to June 2020)',
   y = 'Male and Female Population',
@@ -204,26 +218,30 @@ scale_y_continuous(limits = c(-170000, 170000), n.breaks = 10, labels = function
   theme_bw () +
    theme(legend.text = element_text(size=12))+
   theme(plot.title = element_text(size=16))+
-  theme(plot.subtitle = element_text(size=10))
+  theme(plot.subtitle = element_text(size=10)) +
+  facet_grid(PA ~ .)
 
 SG20
 
 ```
 
 
-### Animating the age-sex pyramid 
-```{r echo=TRUE, fig.height=10, fig.width=10, warning = FALSE, message = FALSE}
+### .. and we animate the age-sex pyramid to see growth in the 4 areas
+```{r echo=TRUE, fig.height=15, fig.width=10, warning = FALSE, message = FALSE}
 
-SG20 +
+library(gganimate)
+
+SG20_animated <- SG20 +
+  scale_y_continuous(limits = c(-8000, 8000), n.breaks = 10)+
 transition_time(Time) +
 ease_aes('linear')
+
+SG20_animated
 
 ```
 ### Doing Interactive plots
 
-Interactive plots help to us compare the same point across 2 graphs
-
-Loading packages for interactive plots
+See below for 2 types of interactive plotting (datatable and 2 interactive graphs). Loading packages for interactive plots
 
 ```{r echo = TRUE}  
 packages = c('tidyverse', 'readxl', 'ggthemes', 'ggiraph', 'plotly', 
@@ -237,63 +255,34 @@ for(p in packages){
 }
 ```
 
-# Creating new data set for interactive plots
+
+# Doing 2 interactive graphs using the same data set
+
+We create a new data set, and then use the function highlight_key to link both data set to enable the interactive highlight across 2 graphs
+
 ```{r echo = TRUE, warning = FALSE, message = FALSE}
 
-interactive_data <- combined %>%
-  spread (Sex, sum(Pop)) %>% 
-  mutate(Total = Females + Males) %>% 
-  group_by(Time, AG, PA) %>% 
-  filter(PA == c("Ang Mo Kio", "Marine Parade")) %>% 
-  summarise(Female = sum(Females), 
-            Male =sum(Males), 
-            Total = sum(Total)) 
+data <- summary_sex_20 %>% 
+  group_by(Time, PA) %>% 
+summarise (Totalpopulation = sum(Pop))
 
-
-interactive_data$AG <- factor(interactive_data$AG, levels = unique(interactive_data$AG))
-
-interactive_data <- interactive_data %>% 
-  mutate(Female_prop = Female / Total*100) %>% 
-    mutate(Male_prop = Male / Total*100) 
-
-head (interactive_data,5)
-
-d <- highlight_key(interactive_data)
-
-
-```
-
-```{r echo=TRUE, fig.height=5, fig.width=10, warning = FALSE, message = FALSE}
-
-
-
+d <-highlight_key(data)
+           
 p1 <- ggplot (data = d,
-        aes(x = Time, 
-            y = Total)) + 
-  geom_col() +
-  labs(title = 'Population across time in 2 Planning areas') +
-facet_wrap(. ~ `PA`)
-  
-  p1
-```
-
-```{r echo=TRUE, warning = FALSE, message = FALSE}
+        aes(x = Time, y = Totalpopulation, fill = PA)) + 
+  geom_col () +
+  labs(title = 'Total population that has stayed in the planning area across 20 years')
 
 p2 <- ggplot (data = d,
-        aes(x =AG,
-            y = Total)) + 
-  geom_point() +
-  labs(title = 'Total population across Age group in the Planning areas for 20 years')+
-facet_wrap(. ~ `PA`) +
-coord_flip()
-  
+        aes(x = Time, y = PA, fill = Time)) + 
+  geom_col () +
+  labs(title = 'Total population that has stayed in the planning area across 20 years')
 
-p2
+
 ```
+# Putting the 2 graphs beside each other
 
-# Putting 2 graphs side by side
-
-Try clicking on 1 graph to see where the point is on the next graph
+you can use the graphs to investigate when each area themselves has the highest population 
 
 ```{r echo=TRUE, warning = FALSE, message = FALSE}
 
@@ -303,44 +292,26 @@ subplot (ggplotly (p1),
 
 ```
 
-# Linking graph with data table using crosstalk
-
-Try clicking on the table to see where is the point in the graph
+or you can see the data table below the chart for data information
 
 ```{r echo=TRUE, warning = FALSE, message = FALSE}
 
-Agegroup_PA <- combined %>% 
-  group_by(AG, PA) %>% 
-  summarise (Pop = sum (Pop))
-
-d <- highlight_key(Agegroup_PA)
-
-p3 <- ggplot (data = d, aes(x = AG, y = Pop))+ 
-  geom_col () +
-  ggtitle ("Age groups in Singapore's Planning Area",
-subtitle = 'Planning Area: {PA}') +
-  coord_flip()
-
-```
-
-```{r echo=TRUE, fig.height=15, fig.width=10, warning = FALSE, message = FALSE}
-
-gg <- highlight(ggplotly(p3),
+gg <- highlight(ggplotly(p1),
                 "plotly_selected")
 
 crosstalk::bscols(gg,
                   DT::datatable(d),
-                  widths = 20)
+                  widths = 15)
 
 ```
 
 # Animating graph by Singapore Planning Area and age group`
 
-Plotting the graph to show the number of population across the age group by Planning area for 20 years (2000 - 2020). 
+To illustrate the population in the 4 areas across the age group for 20 years (2000 - 2020). 
 
 ```{r echo=TRUE, fig.height=15, fig.width=10, message=FALSE, warning=FALSE}
 
-animate1 <- ggplot (Agegroup_PA, aes(x = AG, y = Pop/1000))+ 
+animate1 <- ggplot (summary_sex_20, aes(x = AG, y = Pop/1000))+ 
     geom_col () +
   coord_flip() +
 ggtitle('Planning area: {closest_state}') +
@@ -351,6 +322,5 @@ transition_states (PA) +
   enter_fade() +
   exit_fade()
 
-animate(animate1,fps=2)
-
+animate(animate1,fps=3)
 ```
