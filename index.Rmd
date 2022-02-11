@@ -9,6 +9,3 @@ This webpage consist of a demonstration of my in-class and take-home exercises a
 
 In-class exercises are mostly performed using Tableau.
 Take home exercises are to replicate the same charts using R
-
-
-

@@ -1,25 +1,163 @@
 ---
 title: "DataViz Makeover 1"
-description: |
-  A new article created using the Distill format.
+description: In this post, we present the Labour Force data using Tableau.
 author:
-  - name: Nora Jones 
-    url: https://example.com/norajones
-    affiliation: Spacely Sprockets
-    affiliation_url: https://example.com/spacelysprokets
+  - name: Farah Foo
+    url: https://sg.linkedin.com/in/farahfoo
+    affiliation: SMU Masters in IT business (Fintech and Analytics)
+    affiliation_url: https://scis.smu.edu.sg/master-it-business
 date: "`r Sys.Date()`"
 output: distill::distill_article
+toc: TRUE
+toc_depth: 3
+toc_float: TRUE
+theme: NULL
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(
+  echo = TRUE,
+  cache = FALSE,
+  message = FALSE,
+  fig.retina = 3,
+  warning = FALSE)
+
 ```
 
-Distill is a publication format for scientific and technical writing, native to the web. 
+# 1. Critique of Visualisation
 
-Learn more about using Distill for R Markdown at <https://rstudio.github.io/distill>.
+The data visualisation is created by using data provided by Ministrty of Manpower, Singapore (MOM). The data are available under the page entitle [Statistical Table: Labour Force](https://stats.mom.gov.sg/Pages/LabourForceTimeSeries.aspx).
+
+![Labour force participation rate](C:/farahfoo/VA/DataViz_Makeover/DataViz1 pictures/Graph for critique.png)
+
+## 1a. Clarity
+
+* The order of the age group at the top of the chart is not sorted in ascending or descending order. This makes the graph hard to read. It is also misleading the readers to think there is an increasing trend.
+
+* The Y-axis is labelled as "Lfpr" which cannot be understood by readers. 
+
+* There should be an indication / label that the numbers on the Y-axis is referring to percentage points and not absolute number. 
+
+* There are faint horizontal lines at the 20, 40, 60, 80 levels of the Y-axis. While it helps readers to read across the chart, the chart should have indicated these horizontal lines clearer according to the level that the write wants to highlight.
 
 
+## 1b. Aesthetics
+
+* The labelling of x-axis at bottom of the chart repeats the "2015" and "Year" 14 times across which clutters the chart and lead to unnecessary seperation lines between.
+
+* The chart has a clear title appropriately positioned, rightly sized and clear font placed at the top right hand corner of the chart, however the title of the chart does not highlight out the main point for the readers. There is also no subtitle or accompanying narration on the graph to explain what should readers look out for from the graph.
+
+* There are 14 age groups, however there should not be 14 coloured are graphs as it does not do anything for the readers.
+
+* The legend is unnecessary if there are already lines in the chart showing clearly the different age groups.
 
 
+## 1c. Accuracy
 
+* Each age group column is indicated as Year 2015 at the bottom x-axis, however it is clear in each of the Age-group graph that it should have been made up of multiple years since the area charts are increasing. 
+
+* Readers are also not able to get much insight into each age group since the area chart is squeezed into a tight column.
+
+* The chart has no data source included, so readers cannot understand the data source to put more context around the graph
+
+
+# 2. Proposed Design
+
+The initial sketch of the proposed design is as follow. The final chart may have slight differences as imrpovements are made when the visualisation is created in Tableau.
+
+![Sketch for revised visualisation](C:/farahfoo/VA/DataViz_Makeover/DataViz1 pictures/chart sketch.jpg)
+
+## 2.1 Clarity
+
+* The proposed chart uses a line chart and will show the trend of age groups across the years clearly as it allows for comparison across the age groups, instead of an area chart.
+
+* The Y axis will have a proper name, and the x-axis name will/may be removed since the axis label is inituitive enough
+
+* Any insight will have a clear label on the chart to draw reader's attention to the main point. 
+
+* The second chart at the bottom will focus on showing the proportion of age groups in Singapore so that we can know whether Singapore has a relative aging population.
+
+
+## 2.2 Aesthetics
+
+* The chart will have a clear, informative title, accompanied with a subtitle for more information. There will also be a caption to indicate the data source so readers know the context. 
+
+* We will remove the legend and label the chart directly to reduce clutter
+
+* Values of interesting points will be indicated to readers to get additional information.
+
+
+## 2.3 Accuracy
+
+* In the proposed design, the x-axis will be correctly indicating the timeline / year for the period, so that readers would be able to see the trending across the years. 
+
+
+# 3. Visualisation on Tableau
+
+Pls view the revised visualisation on Tableau Public [here](https://stats.mom.gov.sg/Pages/LabourForceTimeSeries.aspx)
+
+
+# 4. Step-By-Step Preparation
+
+The data is prepared in Tableau software.
+
+4.1 Load the xls file mrsd_20_Res_labour_force_by_age_sex_28Jan2022 into tableau and Select the option “Cleaned with Data interpreter”.
+
+![](C:/farahfoo/VA/DataViz_Makeover/DataViz1 pictures/Picture1.png)
+
+4.2 Note in the data there are 3 rows of text which we should remove. To remove, select filter function at the top right corner and add a filter. Select the females, males, and total and tick exclude.
+
+![](C:/farahfoo/VA/DataViz_Makeover/DataViz1 pictures/Picture2.png)
+
+4.3 Next we only want the rows of data relating to the total population, so we use the Extract function , click edit and then select to extract out the top 12 rows of data only.
+
+![](C:/farahfoo/VA/DataViz_Makeover/DataViz1 pictures/Picture3.png)
+
+4.4 The preview in the data source tab shows all the data available in the raw data, hence to check if the data extracted is correct, create a sheet and pull the years to the row and 1991 to the sum data. 
+
+Perform a check of a single data (eg. Age 15-19 for year 1991) point back to the raw file to know if the data extracted is correct.
+
+![](C:/farahfoo/VA/DataViz_Makeover/DataViz1 pictures/Picture4.png)
+
+4.5 You can see that Tableau and the raw file reports 67.0 for Age 15-19 for year 1991, hence the extract in tableau is correct. 
+
+![](C:/farahfoo/VA/DataViz_Makeover/DataViz1 pictures/Picture5.png)
+
+4.6 Save the file out as mrsd_20_Res_labour_force_by_age_sex_28Jan2022.csv
+
+![](C:/farahfoo/VA/DataViz_Makeover/DataViz1 pictures/Picture6.png)
+
+4.7 Click on add and select text file and load in the created csv file mrsd_20_Res_labour_force_by_age_sex_28Jan2022.csv
+
+![](C:/farahfoo/VA/DataViz_Makeover/DataViz1 pictures/Picture7.png)
+
+4.8 After loading the data, select Connection – Live.
+
+![](C:/farahfoo/VA/DataViz_Makeover/DataViz1 pictures/Picture8.png)
+
+4.9 You will notice that there is a 2007 and 2007a year. Based on the notes from the data source, 2007a is “ June 2007 data have been adjusted based on latest revised population estimates from the Singapore Department of Statistics to facilitate comparisons with June 2008 onwards.”. We will remove the year 2007 from the data set after pivoting.
+
+Select all the columns of years and right click to select pivot. Pivoting the data will transpose the year into a variable / column.
+
+![](C:/farahfoo/VA/DataViz_Makeover/DataViz1 pictures/Picture9.png)
+
+4.10 The data should look like this after pivoting, with a the year as a column variable.
+
+![](C:/farahfoo/VA/DataViz_Makeover/DataViz1 pictures/Picture10.png)
+
+4.11 Remove the year 2007 from the data set since it is a duplicate set of data using edit  add  select 2007 and click exclude.
+
+![](C:/farahfoo/VA/DataViz_Makeover/DataViz1 pictures/Picture11.png)
+
+4.12 To rename the year 2007a to 2007, right click the year column and select calculated field. Write in the if statement. Rename the new column to Year_format.
+
+![](C:/farahfoo/VA/DataViz_Makeover/DataViz1 pictures/Picture12.png)
+
+4.13 Create a new column called “Age Group” to bucket up the Age (years) for easier analysis. 
+
+Right click the Age (Years) column and create group accordingly: a. Young adult (15 – 24), b. Working adult (25 – 39), c. Mid life Worker (40 – 54), d. Retiring (55 – 64), e. Senior (65 – 70 & over)
+
+![](C:/farahfoo/VA/DataViz_Makeover/DataViz1 pictures/Picture13.png)
+
+
+#### The data set is ready for charting!

@@ -58,17 +58,22 @@ for(p in packages){
 # Importing data into R
 
 * Data should be same level as the rmarkdown file to use the relative file path below
+
 ```{r echo = TRUE}  
 exam_data <-read_csv("data/Exam_data.csv")
 summary(exam_data)
+
 ```
+
 * using read.csv instead of read_csv may result in messy column names
+
 
 # Visualisation using ggplot2 package
 
 * ggplot2 is used for Visual Data exploration purpose
 
 * using R graphics to plot histogram vs using ggplot. 
+
 ```{r echo = TRUE}  
 hist(exam_data$MATHS)
 ```
@@ -84,6 +89,7 @@ ggplot(data=exam_data,
                   fill="grey") +
         ggtitle("Distribution of Maths scores") 
 ```
+
 ## GGPLOT2 elements
 * Data
 * Aesthetics (aes =df$variablename)
