@@ -8,7 +8,12 @@ author:
     affiliation: SMU Masters in IT business (Fintech and Analytics)
     affiliation_url: https://scis.smu.edu.sg/master-it-business
 date: "`r Sys.Date()`"
-output: distill::distill_article
+output: 
+  distill::distill_article:
+    toc: true
+    toc_depth: 4
+    toc_float: true
+    code_folding: true
 ---
 
 ```{r setup, include=FALSE}
