@@ -1,0 +1,307 @@
+---
+title: "Hands-on exercise 05"
+description: |
+  Corrplot, Multivariate Heatmap
+author:
+  - name: Nora Jones 
+    url: https://example.com/norajones
+    affiliation: Spacely Sprockets
+    affiliation_url: https://example.com/spacelysprokets
+date: "`r Sys.Date()`"
+output: 
+  distill::distill_article:
+    self_contained: false
+    toc: true
+    code_folding: true
+---
+
+# 2. Installing and Launching R Packages
+
+Use the code chunk below to install and launch corrplot, ggpubr, plotly and tidyverse in RStudio.
+
+```{r echo = TRUE, message = FALSE}
+packages = c('corrplot', 'tidyverse', 'ggstatsplot', 'ggplot2', 'ggcorrplot')
+
+for(p in packages){
+  if(!require(p, character.only = T)){
+    install.packages(p)
+  }
+  library(p, character.only = T)
+}
+
+```
+
+# 3. Importing and Preparing The Data Set
+
+## 3.1 Importing Data
+
+```{r echo = TRUE, message = FALSE}
+wine <- read_csv ( "data/wine_quality.csv")
+
+```
+
+Notice that beside quality and type, the rest of the variables are numerical and continuous data type.
+
+# 4.0 Building Correlation Matrix: pairs() method
+
+## 4.1 Building a basic correlation matrix Figure
+
+## 5.1 The basic plot
+
+```{r fig.width = 7, fig.height = 7}
+ggstatsplot::ggcorrmat(
+  data = wine,
+  cor.vars = 1:11,
+  ggcorrplot.args = list(outline.color = "black",
+                        hc.order = TRUE ,
+                        tl.cex = 10 ) ,
+title = "Correlogram for wine dataset",
+subtitle = "Four pairs are no significant at p < 0.05"
+)
+
+```
+# 6. Visualising Correlation Matrix using corrplot
+
+```{r echo = TRUE, message = FALSE}
+wine.cor <- cor(wine[, 1:11])
+
+corrplot(wine.cor)
+
+```
+
+```{r echo = TRUE, message = FALSE}
+wine.cor <- cor(wine[, 1:11])
+
+corrplot(wine.cor, method = "ellipse")
+
+```
+
+Corrplot and corrplot mix can be used to plot out.
+
+## 6.6.1 Reordering a correlation matrix using hclust
+
+
+
+[Guide here](https://cran.r-project.org/web/packages/corrplot/corrplot.pdf)
+
+```{r echo = TRUE, message = FALSE}
+corrplot.mixed( wine.cor ,
+lower = "ellipse",
+upper = "number" ,
+tl.pos = "lt" ,
+diag = "l" ,
+order= "AOE" ,
+tl.col = "black" )
+
+```
+
+
+corrplot can be ordered by hierarchical clustering eg. order = "hclust"
+hclust.method = c(complete, ward, D2, ward.D. median, average, "centroid".....)
+
+```{r echo = TRUE, message = FALSE}
+corrplot ( wine.cor ,
+method = "ellipse",
+tl.pos = "lt" ,
+tl.col = "black" ,
+order= "hclust" ,
+hclust.method = "ward.D" ,
+addrect = 3 )
+
+```
+
+
+#### 2nd Hands-on Exercise
+
+# Multivariate Data Heat map
+
+Using colour scheme to differentiate the intensity, it can be single colour or opposite colours eg. red vs green.
+
+Data need to be Heatmapr object or metrics
+
+Loading packages for heatmap:
+
+```{r echo = TRUE, message = FALSE}
+packages = c('heatmaply', 'tidyverse', 'ggplot2')
+
+for(p in packages){
+  if(!require(p, character.only = T)){
+    install.packages(p)
+  }
+  library(p, character.only = T)
+}
+
+```
+
+
+```{r echo = TRUE, message = FALSE}
+wh <- read_csv ( "data/WHData-2018.csv")
+
+```
+
+Use country name to replace row names. Not doing so, the dendogram result will show the names as 1,2,3,4,5 (row numbers) instead of country names
+
+Compare not changing row names to changing row names
+
+![Not changing row name](C:/farahfoo/VA/In_Class_ex/In-class_Ex05/picture/not changing.png)
+
+![Changing row name](C:/farahfoo/VA/In_Class_ex/In-class_Ex05/picture/changing.png)
+
+Run code below to change row names.
+
+```{r echo = TRUE, message = FALSE}
+row.names(wh) <- wh$Country
+
+```
+Then use dplyr to transformation whole data to metrics
+
+```{r echo = TRUE, message = FALSE}
+wh1 <- dplyr::select (wh, c(3,7:12))
+wh_matrix <- data.matrix (wh)
+
+```
+
+The dendogram from hierarchical clustering and zoom view options
+
+
+```{r echo = TRUE, message = FALSE}
+wh_heatmap <- heatmap ( wh_matrix,
+scale= "column" ,
+cexRow = 0.6 ,
+cexCol = 0.8 ,
+margins = c ( 10 , 4 ) )
+
+```
+
+# Parallel coordinates plot is for messy larger data set. 
+
+Used for K-means clustering, for massive data
+
+It allows interactive activity from brushing, where it highlights lines of interest and tones down the remaining.
+
+GGally - create static plots
+parcoords = create interactive plots
+
+[Refer to guide here](ggobi.github.io/ggally/reference/ggparcoord.html)
+
+##Loading code and data
+```{r echo = TRUE, message = FALSE}
+
+packages = c ( 'GGally' , 'parcoords', 'parallelPlot',
+'tidyverse')
+for ( p in packages ) {
+if ( ! require ( p , character.only = T
+) ) {
+install.packages( p )
+}
+library ( p ,character.only = T )
+}
+
+wh <- read_csv ( "data/WHData-2018.csv")
+
+```
+
+## ggparcoord
+
+### 1. Plotting a standard ggparcoord.
+
+```{r echo = TRUE, message = FALSE}
+ggparcoord( data = wh , columns = c ( 7 : 12 ) )
+
+```
+
+### 2. ggparcoord with boxplot
+
+```{r echo = TRUE, message = FALSE}
+ggparcoord( data = wh ,
+columns = c ( 7 : 12 ) ,
+groupColumn = 2 ,
+scale = "uniminmax",
+alphaLines = 0.2 ,
+boxplot = TRUE ,
+title = "Parallel Coord. Plot of World Happines Attributes")
+
+```
+* Standardising the scale helps to see better
+* reduce line to darker and lighter
+* do a transparent boxplot to overplot the parallel plot for clarity on the mean, median and quartile ...
+
+### 3. faceting ggparcoord
+
+```{r echo = TRUE, message = FALSE, figwidth = 14, fig.height = 7}
+ggparcoord( data = wh ,
+columns = c ( 7 : 12 ) ,
+groupColumn = 2 ,
+scale = "uniminmax",
+boxplot = TRUE ,
+title = "Parallel Coord. Plot of World Happines Attributes") +
+facet_wrap( ~ Region )
+
+```
+### 4. Interactive plot
+
+brushMode allows you to highlight the Y axis to select the lines within that area.
+
+```{r echo = TRUE, message = FALSE}
+parcoords(
+wh [ ,7 : 12 ] ,
+rownames = FALSE ,
+reorderable = T ,
+brushMode = '1D-axes' ,
+width = 700 ,
+height = 500 )
+
+```
+
+
+### 5. Changing aesthetics to lighter lines
+
+```{r echo = TRUE, message = FALSE}
+parcoords(
+wh [ ,7 : 12 ] ,
+rownames = FALSE ,
+alpha = 0.3 ,
+alphaOnBrushed = 0.2 ,
+reorderable = T ,
+brushMode = '1D-axes' ,
+width = 700 ,
+height = 400 )
+
+```
+
+### 6. More interactivity - mouse over and try
+
+```{r echo = TRUE, message = FALSE}
+wh <- wh %>%
+select ( "Happiness score" , c ( 7 : 12 )
+)
+parallelPlot( wh )
+
+parallelPlot( wh ,
+            continuousCS = "YlOrRd" ,
+            rotateTitle = TRUE )
+
+
+```
+
+### 7. Rotating the axis of the parallel plot to avoid overlapping axis labels
+
+plotting the histogram and the entire population together brings advantage: 
+
+distribution of the entire set and details of the select part of interest
+
+```{r echo = TRUE, message = FALSE}
+parallelPlot( wh ,
+rotateTitle = TRUE )
+
+histoVisibility <- rep ( TRUE , ncol ( wh )
+)
+parallelPlot( wh ,
+rotateTitle = TRUE ,
+histoVisibility = histoVisibility)
+
+```
+
+
+
+
