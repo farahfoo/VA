@@ -12,7 +12,6 @@ output:
     toc: true
     toc_depth: 4
     toc_float: true
-    theme: NULL
     code_folding: true
 ---
 
@@ -97,7 +96,9 @@ The initial sketch of the proposed design is as follow. The final chart may have
 
 # 3. Visualisation on Tableau
 
-Pls view the revised visualisation on Tableau Public [here](https://stats.mom.gov.sg/Pages/LabourForceTimeSeries.aspx)
+Pls view the revised visualisation on Tableau Public [here](https://public.tableau.com/app/profile/frostbear/viz/DataVizMakeover1-LabourforceParticipation/Dashboard1)
+
+![Revised visualisation in Tableau](C:/farahfoo/VA/DataViz_Makeover/DataViz1 pictures/revised visualisation.png)
 
 
 # 4. Step-By-Step Preparation
@@ -165,6 +166,22 @@ Select all the columns of years and right click to select pivot. Pivoting the da
 * Senior (65 – 70 & over)
 
 ![](C:/farahfoo/VA/DataViz_Makeover/DataViz1 pictures/Picture13.png)
-
-
 #### The data set is ready for charting!
+
+
+#5. 3 Major observations from the 2 graphs
+
+* Young adult (15 – 24), 
+* Working adult (25 – 39),
+* Mid life Worker (40 – 54), 
+* Retiring (55 – 64), 
+* Senior (65 – 70 & over)
+
+a) *Mid life workers*: In the 1990s, there was a rapid increase in the number of mid life workers from 354k to 563k, a 59% increase.  In year 2020, the number of midlife workers fell below the number of working adults at about 800k population, a trend not seen for the last decade. More data is required to investigate if this change in trend (increase in working adults and decrease in mid life worker) was a result of jobs lost during Covid, or change in life objectives.
+
+b) *Senior workers:* The Singapore retirement age will be raised to 63 only in 1st July 2022, yet the number of seniors at work has been on the rise post 2005 to hit 185k in 2020. This number exceeds the number of young adults which population has been almost constant for the past decade. The proportion of workforce supported by seniors have risen from 1.59% in the 1990s to 8.26% in the 2020s. While the proportion split for the decade of 2020s may yet change in the future, for now there seems to be a trend that the work force will be supported by people of older age.
+
+c) *Working population profile:* Overall the Singapore working population is still on the rise from 1991, but there is a shift in the makeup of the workforce, a rising trend to have more workers in the Retiring and Senior age groups from 2 observations:
+* The number of young adults in the workforce remains consistent, but in terms of proportion, this age group has decreased from 14.66% to 7.03%. 
+* The number of retiring workers have risen from 277k to 417k and proportion from 6.22% to 17.69% from 2010 to 2020.
+
