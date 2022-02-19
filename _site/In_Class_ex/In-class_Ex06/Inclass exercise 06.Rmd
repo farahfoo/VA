@@ -17,20 +17,23 @@ output:
 ---
 
 
-# ################### Tableau Exercise ##############################
+# Tableau Exercise
 This link has many data sources suitable for time-series [CEIC data base](https://insights.ceicdata.com/)
 
 Tableau pivot function is equivalent to the R Dplyr ::pivotlong
 
 ## 1) View my Tableau dashboard [here](https://public.tableau.com/app/profile/frostbear/viz/SingaporetouristsArrivalsbyAir-Timeseriescycleplot/Dashboard1?publish=yes) to see the Singapore tourists arrivals by air from 2010 to 2019.
+
 ![Snapshot](C:/farahfoo/VA/Pictures/Arrivals cycle plot.png)    
 
 ## 2) View my Tableau dashboard [here](https://public.tableau.com/app/profile/frostbear/viz/D05stockpriceincandlestickformat/D05?publish=yes) to see the DBS (D05) stock price chart plotted in Tableau candle stick format.
+
 ![Snapshot](C:/farahfoo/VA/Pictures/D05 candlestick.png)
 ## 3) View my Tableau dashboard [here](https://public.tableau.com/app/profile/frostbear/viz/Cyberattackheatmap/Numberofcyberattacksheatmap?publish=yes) to see the heatmap of cyber attacks.
+
 ![Snapshot](C:/farahfoo/VA/Pictures/cyber attack heatmap.png)
 
-# ################### R EXERCISE ##############################
+# R EXERCISE
 
 ## To load packages required today:
 
