@@ -1,0 +1,202 @@
+---
+title: "In class exericse 06 "
+description: |
+  Time series
+author:
+  - name: Frostbear 
+    url: https://sg.linkedin.com/in/farahfoo
+    affiliation: SMU Masters in IT business (Fintech and Analytics)
+    affiliation_url: https://scis.smu.edu.sg/master-it-business
+date: "`r Sys.Date()`"
+output: 
+  distill::distill_article:
+    toc: true
+    toc_depth: 4
+    toc_float: true
+    code_folding: FALSE
+---
+
+
+# Tableau Exercise
+This link has many data sources suitable for time-series [CEIC data base](https://insights.ceicdata.com/)
+
+Tableau pivot function is equivalent to the R Dplyr ::pivotlong
+
+## 1) View my Tableau dashboard [here](https://public.tableau.com/app/profile/frostbear/viz/SingaporetouristsArrivalsbyAir-Timeseriescycleplot/Dashboard1?publish=yes) to see the Singapore tourists arrivals by air from 2010 to 2019.
+
+![Snapshot](C:/farahfoo/VA/Pictures/Arrivals cycle plot.png)    
+
+## 2) View my Tableau dashboard [here](https://public.tableau.com/app/profile/frostbear/viz/D05stockpriceincandlestickformat/D05?publish=yes) to see the DBS (D05) stock price chart plotted in Tableau candle stick format.
+
+![Snapshot](C:/farahfoo/VA/Pictures/D05 candlestick.png)
+## 3) View my Tableau dashboard [here](https://public.tableau.com/app/profile/frostbear/viz/Cyberattackheatmap/Numberofcyberattacksheatmap?publish=yes) to see the heatmap of cyber attacks.
+
+![Snapshot](C:/farahfoo/VA/Pictures/cyber attack heatmap.png)
+
+# R EXERCISE
+
+## To load packages required today:
+
+```{r echo = TRUE}  
+packages = c('scales', 'viridis', 'lubridate', 'ggthemes', 'gridExtra', 
+             'tidyverse', 'readxl', 'knitr', 'data.table')
+
+for(p in packages){
+  if(!require(p, character.only = T)){
+    install.packages(p)
+  }
+  library(p, character.only = T)
+}
+
+```
+
+## Loading in excel data
+
+```{r echo = TRUE, warning = FALSE, message = FALSE}
+attacks <- read_csv("data/eventlog.csv")
+
+kable(head(attacks))
+
+
+```
+
+## Use lubridate to convert the time according to the zone and then extract out the day month year
+
+```{r echo = TRUE, warning = FALSE, message = FALSE}
+
+make_hr_wkday <- function(ts, sc, tz) {
+  real_times <- ymd_hms(ts, 
+                        tz = tz[1], 
+                        quiet = TRUE)
+  dt <- data.table(source_country = sc,
+                   wkday = weekdays(real_times),
+                   hour = hour(real_times))
+  return(dt)
+}
+
+```
+
+
+## Inserting the weekday level for us to use it to organise and control the sorting
+
+Group by the timezone to count the events. Use levels to sequence the days by the predefined sequence wkday. Also convert into factor to allow counting.
+
+```{r echo = TRUE, warning = FALSE, message = FALSE}
+
+wkday_levels <- c('Sunday', 'Monday', 
+                  'Tuesday', 'Wednesday', 
+                  'Thursday', 'Friday', 
+                  'Saturday')
+attacks <- attacks %>%
+  group_by(tz) %>%
+  do(make_hr_wkday(.$timestamp, 
+                   .$source_country, 
+                   .$tz ) ) %>% 
+  ungroup() %>% 
+  mutate(wkday = factor(wkday, 
+                        levels = wkday_levels),
+         hour  = factor(hour, 
+                        levels = 0:23))
+
+head (attacks, 5)
+
+```
+
+## Plotting the headmap by weekday and time
+
+Use geom_tile to plot heatmap.
+Viridis is a colour scheme
+
+```{r echo = TRUE, warning = FALSE, message = FALSE}
+
+# This is to pull some data/ counting required, after finishing, ungroup the data to reuse later on.
+
+grouped <- attacks %>% 
+  count(wkday, hour) %>% 
+  ungroup()
+
+
+ggplot(grouped, aes(hour, wkday, fill = n)) + 
+geom_tile(color = "white", size = 0.1) + 
+theme_tufte(base_family = "Helvetica") + 
+coord_equal() + 
+scale_fill_viridis(name = "# of Events", label = comma) + 
+labs(x = NULL, y = NULL, 
+     title = "Events per day of week & time of day") +
+  
+theme(axis.ticks = element_blank(),
+      plot.title = element_text(hjust = 0.5),
+      legend.title = element_text(size = 8),
+      legend.text = element_text(size = 6) )
+
+```
+
+
+## Doing cycleplot in R on Singapore arrivals by air
+
+```{r echo = TRUE, warning = FALSE, message = FALSE}
+
+air <- read_excel("data/arrivals_by_air.xlsx")
+
+
+```
+
+From the existing field month-year, using lubriate month and year function to pull out the year and month into 2 new columns. Set the numbers to factors as 1 to 12 and label the labels as the month abbreviation.
+
+```{r echo = TRUE, warning = FALSE, message = FALSE}
+
+air$month <- factor(month(air$`Month-Year`), 
+                    levels=1:12, 
+                    labels=month.abb, 
+                    ordered=TRUE) 
+
+#ymd tells lubridate this is the existing format of data in month-year
+
+air$year <- year(ymd(air$`Month-Year`))
+
+colnames(air)
+
+```
+
+Extract the country you want, the month and the year for cycle plot
+
+```{r echo = TRUE, warning = FALSE, message = FALSE}
+
+New_Zealand <- air %>% 
+  select(`New Zealand`, 
+         month, 
+         year) %>%
+  filter(year >= 2010)
+
+```
+
+The reference line needs to be calculated, add a hline using the mean.
+
+```{r echo = TRUE, warning = FALSE, message = FALSE}
+
+hline.data <- New_Zealand %>% 
+  group_by(month) %>%
+  summarise(avgvalue = mean(`New Zealand`)) %>% 
+  ungroup()
+
+```
+
+## Cycle plot
+
+```{r echo = TRUE, warning = FALSE, message = FALSE}
+
+ggplot() + 
+  geom_line(data=New_Zealand, aes(x=year, y=`New Zealand`, group=month), 
+            colour="black") +
+  geom_hline(aes(yintercept=avgvalue), 
+             data=hline.data, linetype=6, colour="red", size=0.5) + 
+  facet_grid(~month) +
+  labs(axis.text.x = element_blank()) +
+  xlab("") +
+  ylab("No. of Visitors")
+```
+
+Compare with the one done using Tableau [here](https://public.tableau.com/app/profile/frostbear/viz/SingaporetouristsArrivalsbyAir-Timeseriescycleplot/Dashboard1?publish=yes) 
+![Snapshot](C:/farahfoo/VA/Pictures/Arrivals cycle plot.png)  
+
+
