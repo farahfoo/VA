@@ -1,0 +1,196 @@
+---
+title: "Take home Exercise 5 - due 20 Feb 2359"
+description: |
+  Putting Visual Analytics into Practical Use
+author:
+  - name: Frostbear 
+    url: https://sg.linkedin.com/in/farahfoo
+    affiliation: SMU Masters in IT business (Fintech and Analytics)
+    affiliation_url: https://scis.smu.edu.sg/master-it-business
+date: "`r Sys.Date()`"
+output: 
+  distill::distill_article:
+    toc: true
+    toc_depth: 4
+    toc_float: true
+    code_folding: FALSE
+---
+
+# Task
+Create a data visualisation to segment kid drinks and other by nutrition indicators. For the purpose of this task, starbucks_drink.csv should be used.
+
+
+
+# Installing and Launching R Packages
+
+Use the code chunk below to install and launch corrplot, ggpubr, plotly and tidyverse in RStudio.
+
+```{r echo = TRUE, message = FALSE}
+packages = c('corrplot', 'tidyverse', 'ggstatsplot', 'ggplot2', 'ggcorrplot', 'GGally', 'parcoords')
+
+for(p in packages){
+  if(!require(p, character.only = T)){
+    install.packages(p)
+  }
+  library(p, character.only = T)
+}
+
+```
+
+## Importing Data
+
+The data set consist of 18 variables and 2068 observations, of starbucks drinks and its contents.
+
+```{r echo = TRUE, warning = FALSE, message = FALSE}
+
+starbucks <- read_csv("data/starbucks_drink.csv")
+
+head (starbucks, 3)
+
+```
+
+## Correlation Matrix
+
+Plotting a correlation matrix for all the drinks in the data set
+
+```{r fig.width = 7, fig.height = 7}
+ggstatsplot::ggcorrmat(
+  data = starbucks,
+  cor.vars = 1:13,
+  ggcorrplot.args = list(outline.color = "black",
+                        hc.order = TRUE ,
+                        tl.cex = 10 ) ,
+title = "Correlogram for starbucks",
+subtitle = "All pairs are significant at P <0.05")
+
+```
+
+Plotting correlation matrix for the category "kids drinks and other"
+
+```{r fig.width = 7, fig.height = 7}
+
+starbucks.kids <- starbucks %>% 
+  filter(Category == "kids-drinks-and-other") %>% 
+  select(c(3:14))
+
+starbucks.cor<-cor(starbucks.kids)
+
+
+corrplot (starbucks.cor, method = "ellipse",
+          tl.pos = "lt" ,
+          tl.col = "black" ,
+          order= "hclust" ,
+          hclust.method = "complete" ,
+          addrect = 3 )
+```
+
+Showing the correlation table in a mixed layout format, 
+
+```{r fig.width = 7, fig.height = 7}
+
+corrplot.mixed( starbucks.cor, lower = "ellipse",
+                upper = "number" ,
+                tl.pos = "lt" ,
+                diag = "l" ,
+                tl.col = "black" )
+```
+
+Performing the correlation test to see which pair of variables are statistically significant, the below combines the corrgram with the significant test. 
+
+Figure reveals that not all correlation pairs are statistically significant. 
+* the correlation between the portion and calories, sodium, sugar and total carbo is statistically significant at significant level 0.05
+* but not for Cholesterol total fat. 
+
+```{r fig.width = 7, fig.height = 7}
+
+starbucks.sig = cor.mtest( starbucks.cor , conf.level= .95 )
+
+corrplot ( starbucks.cor ,
+            method = "number" ,
+            type = "lower" ,
+            diag = FALSE ,
+            tl.col = "black" ,
+            tl.srt = 45 ,
+            p.mat = starbucks.sig $ p ,
+            sig.level = .05 )
+
+```
+```{r fig.width = 7, fig.height = 7}
+
+starbucks.kids1 <- starbucks %>% 
+  filter(Category == "kids-drinks-and-other") 
+
+```
+
+## Plotting a basic parallel coordinates plot using ggparcoord() on 5 variables of interest - Portion, Calories, Total fat, Cholesterol and Sugar
+There are 5 sizes of the drinks.
+
+```{r fig.width = 12, fig.height = 7}
+
+unique(starbucks.kids1$Size)
+
+starbucks.kids1  <- starbucks.kids1 %>% 
+  mutate (sizelevel = case_when (Size == 'Tall' ~ 3,
+                                 Size == 'Grande' ~ 4,
+                                 Size == 'Venti' ~ 5, 
+                                 Size == 'Kids' ~ 1, 
+                                 Size == 'Short' ~ 2)) 
+
+ggparcoord( data = starbucks.kids1 ,
+columns = c ( 4,6,9,13 ),
+groupColumn = 2 ,
+scale = "uniminmax",
+boxplot = TRUE ,
+title = "Parallel Coordinate plot of Kids drinks at starbucks") +
+facet_wrap( sizelevel ~ Name )
+
+```
+From the chart, it is clear that Total Fat and Cholesterol is negligible in Steamed Apple Juice. The salted caramel hot chocolate drink has the highest amount of sugar and calories compared to other drinks of the Venti size.
+
+
+## Plotting an Interactive Parallel Coordinates Plot
+
+Lets compare the Hot chocolate and Pumpkin Spice Creme drink. Prepare the data sets for the 2 drinks
+
+Highlight over the range to see the selection activated
+
+```{r fig.width = 15, fig.height = 5}
+
+unique(starbucks.kids1$Name)
+
+hotchocolate <- starbucks.kids1 %>% 
+  filter (Name == 'Hot Chocolate')
+
+steamedapplejuice <- starbucks.kids1 %>% 
+  filter (Name == 'Steamed Apple Juice')
+```
+
+Interactive graph for hot chocolate. Compare it to the pumpkin spice creme
+
+```{r fig.width = 15, fig.height = 5}
+
+parcoords((hotchocolate [ , c(3,4,6,9,13)]),
+rownames = FALSE ,
+alpha = 0.3 ,
+alphaOnBrushed = 0.2 ,
+reorderable = T ,
+brushMode = '1D-axes' ,
+width = 700 ,
+height = 400 )
+
+```
+
+Interactive graph for pumpkin spice creme. Compare it to the hot chocolate
+
+```{r fig.width = 15, fig.height = 5}
+
+parcoords((steamedapplejuice [ , c(3,4,6,9,13)]),
+rownames = FALSE ,
+alpha = 0.3 ,
+alphaOnBrushed = 0.2 ,
+reorderable = T ,
+brushMode = '1D-axes' ,
+width = 700 ,
+height = 400 )
+
+```
