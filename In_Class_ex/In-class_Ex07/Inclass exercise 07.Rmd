@@ -1,0 +1,100 @@
+---
+title: "In class exericse 07 "
+description: |
+  Time series
+author:
+  - name: Frostbear 
+    url: https://sg.linkedin.com/in/farahfoo
+    affiliation: SMU Masters in IT business (Fintech and Analytics)
+    affiliation_url: https://scis.smu.edu.sg/master-it-business
+date: "`r Sys.Date()`"
+output: 
+  distill::distill_article:
+    toc: true
+    toc_depth: 4
+    toc_float: true
+    code_folding: FALSE
+---
+
+# TABLEAU EXERCISE
+
+* Mapping of toto outlets in tableau by using wgs coordinate format and indicating the X and Y to longtitude and latitude data formats respectively. For project coordinates systems like svy, need to do conversion
+![Map here](C:/farahfoo/VA/Pictures/Mapping of toto outlets in singapore.PNG)
+* Realis data does not have X an Y coordinates, but Tableau is able to consume the API from [www.onemap.gov.sg](www.onemap.gov.sg) to plot out as a map, and then return the latitude and longtitude for you. Realis data is from URA residental transaction website. 
+![Map here](C:/farahfoo/VA/Pictures/Mapping of residential transactions in SG - data.PNG)
+
+![Map here](C:/farahfoo/VA/Pictures/Mapping of residential transactions in SG.PNG)
+
+* Use the smu library CEIC 
+
+* GADM - get administrative boundary map for free in KMZ or Shapeflie format
+
+* data.gov.sg - get boundaries map
+
+* singstat - get residents dat by planning subzone
+
+
+
+
+# R EXERCISE
+
+## To load packages required today:
+
+```{r echo = TRUE}  
+packages = c('tidyverse', 'sf', 'tmap')
+
+for(p in packages){
+  if(!require(p, character.only = T)){
+    install.packages(p)
+  }
+  library(p, character.only = T)
+}
+
+sgpools <- read_csv ("data/aspatial/SGPools_svy21.csv")
+
+head (sgpools, 3)
+
+```
+* combining the xcoord and ycoord into a new column of spatial data and the order of the coordinates must be longtitude-latitude.
+
+```{r echo = TRUE}  
+sgpools_sf <- st_as_sf(
+  sgpools,
+  coords = c("XCOORD", "YCOORD"),
+          crs=3414)
+
+head (sgpools_sf, 3)
+```
+
+
+* Using tmap to wrap everything into a leaflet format. tmap works like ggplot2, for map creation. 
+
+all maps must start with tm_shape
+
+```{r echo = TRUE}  
+tmap_mode("view")
+
+tm_shape(sgpools_sf) +
+tm_bubbles(col = "green",
+            size = 0.5,
+            border.col = "black",
+            border.lwd = 1,
+           interactive = TRUE)
+```
+
+
+
+```{r echo = TRUE}  
+
+tm_shape(sgpools_sf) +
+tm_bubbles(col = "OUTLET TYPE",
+            size = "Gp1Gp2 Winnings",
+            border.col = "black",
+            border.lwd = 0.5,
+           interactive = TRUE) +
+  tm_facets(by= "OUTLET TYPE",
+            nrow = 1,
+            sync = TRUE)
+
+```
+

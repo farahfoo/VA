@@ -1,0 +1,68 @@
+---
+title: "Take home Exercise 6 - due 27 Feb 2359"
+description: |
+  Revealing the impact of COVID-19 on the stock prices of top 40 companies in Singapore by market capitalisation.
+author:
+  - name: Frostbear 
+    url: https://sg.linkedin.com/in/farahfoo
+    affiliation: SMU Masters in IT business (Fintech and Analytics)
+    affiliation_url: https://scis.smu.edu.sg/master-it-business
+date: "`r Sys.Date()`"
+output: 
+  distill::distill_article:
+    toc: true
+    toc_depth: 4
+    toc_float: true
+    code_folding: FALSE
+---
+
+Task was performed with references to [here](https://giniceseah.netlify.app/posts/2021-06-18-scraping-of-financial-dataset/#tidyquant-package)
+
+# Task
+* Script stock prices of top 40 companies in Singapore by market capitalisation between 1st January 2020 - 31st December 2021 by using tidyquant R package. [Link here](https://companiesmarketcap.com/singapore/largest-companies-in-singapore-by-market-cap/)
+* For how to script historical stock price from Yahoo Finance by using tidyquant package, you can refer to this article.
+* Using either calender heatmap or horizon graph, prepare a data visualisation showing the historical stock prices by the top 40 companies by market capitalisation.
+* For horizon graph, you can refer to ggHoriPlot, a ggplot2 based R package specially designed for plotting horizon graph.
+* For calender heatmap, you can refer to ggTimeSeries, a ggplot2 extension provides additional display mediums for time series visualisations.
+
+
+
+# Installing and Launching R Packages
+
+Use the code chunk below to install and launch corrplot, ggpubr, plotly and tidyverse in RStudio.
+
+```{r echo = TRUE, message = FALSE}
+
+packages = c('Quandl','rvest','quantmod','tidyquant','rmarkdown','tidyr','tidyverse',
+             'data.table','XML','xml2','httr','rmarkdown','knitr')
+for (p in packages) {
+  if(!require(p,character.only = T)){
+    install.packages(p)
+  }
+  library(p,character.only = T)
+}
+
+```
+
+The code read_html() will be used to query data from Yahoo Finance. We are also using html_node()/html_nodes() to locate the first node that matches that selector and then we would extract its contents as text using html_text().
+
+# rvest package
+
+```{r echo = TRUE, message = FALSE}
+
+symbol = 'AAPL'
+url = paste0('https://finance.yahoo.com/quote/', symbol, '/financials?p=', symbol)
+html_data = read_html(url) %>% html_node('body') %>% html_text()
+
+```
+
+rvest is a much general R packages where it allow scraping of data from any html webpage and not specific to only financial dataset. rvest library uses the technique of web scraping that enable us to parse the HTML content of a given URL and access the individual attribute that had been stored in the table on the page of the dataset.
+
+
+# quantmod package
+
+```{r echo = TRUE, message = FALSE}
+
+getSymbols ('AAPL', from="2015-01-01", to="2021-06-01")
+
+```
