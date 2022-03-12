@@ -16,11 +16,19 @@ output:
     code_folding: FALSE
 ---
 
+# Network Metrics
+
+The network is built using the statistics, to determine the number of nodes, complexity, visual clustering, closeness of the nodes. 
+Between-ness is referring to the importance of the node / concentration risk.
+
+Close-ness means which node is the central that requires the least number of paths to travel from 1 end to the other.
+
 # Examples of network
 
 ![social network by Prof Kam](C:/farahfoo/VA/Pictures/social network.PNG)
 
 ![Singapore flight by Prof Kam](C:/farahfoo/VA/Pictures/singapore flight network.PNG)
+The centrality index is based on the number of flights from one airport to another airport. 
 
 ![Project management network by Prof Kam](C:/farahfoo/VA/Pictures/project management network.PNG)
 
@@ -30,4 +38,22 @@ output:
 
 * [tidygraph](https://www.data-imaginist.com/2017/introducing-tidygraph/) is a Tidy API for graph manipulation. 
 
+# Organising the layouts of the network
+
+* [Force-directed layouts](C:/farahfoo/VA/Pictures/force-directed layout.PNG) help to put the layout with equal distance. It is used when all members have the same characteristics. 
+* Time layouts
+* Radial hierarchical layout
+* [Geographical layout](https://wiki.smu.edu.sg/1617t3isss608g1/ShinyNET_Data_Prep_Report)
+* Tree hierarchical layout - used to map out file path directory
+* [Sankey diagram](https://observablehq.com/@d3/sankey) - use to show industry products and different energy use in the UK. ![Sankey network by Prof Kam](C:/farahfoo/VA/Pictures/sankey.PNG)
+* [Hive plot] (https://konstantinkashin.com/assets/data/hiveplot.html) - very new to show network of individual 
+
+# Customisation of parts of the visualisation to represent
+
+Node size, Label, Shapes, Images, Border colour, Weight of line, line colour, line type all can be customised to value-add to the network visualisation.
+
+Network visualisation [basic attributes](C:/farahfoo/VA/Pictures/Network visualisation basic attributes.PNG)
+
+
+# In-class exercise
 
