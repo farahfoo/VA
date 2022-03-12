@@ -64,5 +64,88 @@ rvest is a much general R packages where it allow scraping of data from any html
 ```{r echo = TRUE, message = FALSE}
 
 getSymbols ('AAPL', from="2015-01-01", to="2021-06-01")
-
+head(AAPL)
+AAPL =  last(AAPL,'1 year') 
+head(AAPL)
+AAPL =  first(AAPL,'1 year') 
 ```
+
+```{r echo = TRUE, message = FALSE}
+
+stocklist=c("AAPL","GOOG")
+getSymbols(stocklist)
+hk=getSymbols("0941.HK",src="yahoo", auto.assign=FALSE)
+head(hk)
+```
+
+Looking at volume data
+
+```{r echo = TRUE, message = FALSE}
+
+Weekvol = apply.weekly(Vo(AAPL),sum)
+head(Weekvol)
+
+#Monthly trade volume
+
+Mthvol = apply.monthly(Vo(AAPL),sum)
+head(Mthvol)
+
+#Yearly trade volume
+
+Yearvol = apply.yearly(Vo(AAPL),sum)
+head(Yearvol)
+
+#Quarterly trade volume
+
+Quartervol = apply.quarterly(Vo(AAPL),sum)
+head(Quartervol)
+
+# Weekly trade volume average 
+
+Weekvol = apply.weekly(Vo(AAPL),mean)
+head(Weekvol)
+```
+
+
+# tidyquant package
+
+```{r echo = TRUE, message = FALSE}
+
+from_date = "2015-01-01"
+to_date = "2021-06-01"
+period_type = "days"  # "days"/ "weeks"/ "months"/ "years"
+stock_selected = "AAPL" 
+
+stock_data_daily = tq_get(stock_selected,
+               get = "stock.prices",
+               from = from_date,
+               to = to_date) %>%tq_transmute(select     = NULL, 
+               mutate_fun = to.period, 
+               period  = period_type)
+
+paged_table(stock_data_daily)
+```
+
+In addition, benchmark indexes could be selected based on user requirements that help time series analysis to be performed much more effectively.
+
+
+```{r echo = TRUE, message = FALSE}
+
+from_date = "2015-01-01"
+to_date = "2021-06-01"
+period_type = "days"  # "days"/ "weeks"/ "months"/ "years"
+benchmark_selected = "XLK" 
+
+benchmark_data_daily = tq_get(benchmark_selected,
+               get = "stock.prices",
+               from = from_date,
+               to = to_date) %>%tq_transmute(select  = NULL, 
+               mutate_fun = to.period, 
+               period  = period_type)
+
+paged_table(stock_data_daily)
+```
+
+tq_get() is of similar function property as the quantmod R packages getSymbols() but the data query is returned in tibble format. To look into what are the other option available for tq_get(), we will be using tq_get_options() .
+
+In the event when we need to query dataset from Yahoo Finance not restricted to stock price, we are able to make changes to the get argument within tq_get() to retrieve other key attributes such as ‘key.stats’,’dividends’,’stock.prices.japan’ etc. Also, using tq_exchange() we are able to retrieve all the names of the individual stocks that are within a given exchange.

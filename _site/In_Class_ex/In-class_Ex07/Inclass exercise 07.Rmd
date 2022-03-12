@@ -38,6 +38,8 @@ output:
 
 # R EXERCISE
 
+# Ex 1:Mapping Geospatial Point Data with R
+
 ## To load packages required today:
 
 ```{r echo = TRUE}  
@@ -53,8 +55,8 @@ for(p in packages){
 sgpools <- read_csv ("data/aspatial/SGPools_svy21.csv")
 
 head (sgpools, 3)
-
 ```
+
 * combining the xcoord and ycoord into a new column of spatial data and the order of the coordinates must be longtitude-latitude.
 
 ```{r echo = TRUE}  
@@ -68,7 +70,6 @@ head (sgpools_sf, 3)
 
 
 * Using tmap to wrap everything into a leaflet format. tmap works like ggplot2, for map creation. 
-
 all maps must start with tm_shape
 
 ```{r echo = TRUE}  
@@ -82,7 +83,9 @@ tm_bubbles(col = "green",
            interactive = TRUE)
 ```
 
+## Faceting 2 maps for synchronisation view
 
+sync = True will ensure the 2 maps move in tandem
 
 ```{r echo = TRUE}  
 
@@ -96,5 +99,200 @@ tm_bubbles(col = "OUTLET TYPE",
             nrow = 1,
             sync = TRUE)
 
+```
+
+# Ex 2: Choropleth Mapping with R
+
+use st_read function to convert the .shp file into 1 single tibble object, to get an administrative boundary map, and a column of geometry (string of coordinates)
+
+```{r echo = TRUE}  
+
+mpsz <- st_read(dsn = "data/geospatial",
+                layer = "MP14_SUBZONE_WEB_PL")
+
+head (mpsz, 1)
+```
+
+
+*Read in the population data*
+
+```{r echo = TRUE}  
+
+popagsex <- read_csv("data/aspatial/respopagsex2000to2018.csv")
+
+head (popagsex, 2)
+```
+*prepare the population data for use*
+
+* spread function is an old function already. Try replacing with pivot_wider
+* note the difference in the code to sum the Young and Economy active. Young lists all the column names, but economy active counts the column number.
+
+
+
+```{r echo = TRUE}  
+
+popagsex2018_male <- popagsex %>%
+filter(Sex == "Males") %>%
+filter(Time == 2018) %>%
+spread(AG, Pop) %>%
+mutate(YOUNG = `0_to_4`+`5_to_9`+`10_to_14`+
+`15_to_19`+`20_to_24`) %>%
+mutate(`ECONOMY ACTIVE` = rowSums(.[9:13]) + 
+                          rowSums(.[15:17]))%>%
+mutate(`AGED`=rowSums(.[18:22])) %>%
+mutate(`TOTAL`=rowSums(.[5:22])) %>%
+mutate(`DEPENDENCY` = (`YOUNG` + `AGED`)/`ECONOMY ACTIVE`) %>%
+
+# this converts the PA and SZ to upper case to left_join later on
+mutate_at(.vars = vars(PA, SZ),.funs = funs(toupper)) %>%
+  
+select(`PA`, `SZ`, `YOUNG`,`ECONOMY ACTIVE`, `AGED`,`TOTAL`, `DEPENDENCY`) %>%
+filter(`ECONOMY ACTIVE` >0)
+
+head (popagsex2018_male, 2)
+
+```
+
+## left join the 2 tables using SUBZONE_N and SZ
+
+```{r echo = TRUE}  
+glimpse (popagsex2018_male)
+
+mpsz_agemale2018 <- left_join(mpsz,popagsex2018_male,by = c("SUBZONE_N"="SZ"))
+
+head (mpsz_agemale2018, 2)
+
+```
+
+# note that this map has missing values as there are some ares with no population
+
+```{r echo = TRUE}  
+
+tmap_mode("plot")
+
+qtm(mpsz_agemale2018,fill ="DEPENDENCY")
+
+```
+
+
+# Drawing the map with tm_fill and tm_border
+
+```{r echo = TRUE}  
+
+tm_shape(mpsz_agemale2018) +
+tm_polygons()
+
+
+tm_shape(mpsz_agemale2018) +
+tm_polygons("DEPENDENCY")
+
+
+```
+
+* lwd = border line width. The default is 1,
+* alpha= transparency number between 0 (totallytransparent) and 1 (not transparent). By default,the alpha value of the col is used (normally 1),
+* col= border colour, and
+* lty= border line type. The default is "solid".
+
+```{r echo = TRUE}  
+tm_shape(mpsz_agemale2018) +
+tm_fill("DEPENDENCY")
+
+tm_shape(mpsz_agemale2018) +
+tm_fill("DEPENDENCY")+
+  tm_borders(lwd = 0.1,
+             alpha = 1)
+```
+
+# Data classification methods of tmap
+
+Most choropleth maps employ some method of dataclassification. The point of classification is to take alarge number of observations and group them into data ranges or classes.
+
+Compare the 2 styles below: quantile vs equal, the intervals are different
+
+```{r echo = TRUE}  
+
+tm_shape(mpsz_agemale2018) + 
+  tm_fill("DEPENDENCY",n =8,style ="quantile") +
+tm_borders(alpha =0.5) +
+  tm_layout(main.title ="Quantile interval distribution")
+
+```
+
+```{r echo = TRUE}  
+
+tm_shape(mpsz_agemale2018) + 
+  tm_fill("DEPENDENCY",n =8,style ="equal") +
+tm_borders(alpha =0.5) +
+  tm_layout(main.title ="Equal interval distribution")
+
+```
+
+## adding colour palette
+
+```{r echo = TRUE}  
+
+tm_shape(mpsz_agemale2018) +
+tm_fill("DEPENDENCY", n = 6,style ="quantile",palette ="Blues") +
+  tm_borders(alpha =0.5) 
+
+
+```
+
+just add a "-" sign infront to inverse the colour scale
+```{r echo = TRUE}  
+
+tm_shape(mpsz_agemale2018) +
+tm_fill("DEPENDENCY", n = 6,style ="quantile",palette ="-Blues") +
+  tm_borders(alpha =0.5) +
+  tm_layout(main.title ="Reversing colour scheme",
+  main.title.position ="center",
+main.title.size =1,
+legend.height =0.45,
+legend.width =0.35,
+legend.outside =FALSE,
+legend.position = c("right", "bottom"),
+frame =FALSE)
+
+```
+
+# Add ing Cartographic Furniture into the tmap
+
+Add in compass, scalebar, gridlines into the map
+
+```{r echo = TRUE}  
+
+tm_shape(mpsz_agemale2018)+
+tm_fill("DEPENDENCY",style ="quantile",palette ="Blues",title ="No. of persons") +
+tm_layout(main.title ="Distribution of Dependency Ratio \nby planning subzone",
+main.title.position ="center",main.title.size =1.2,
+legend.height =0.45,
+legend.width =0.35,
+frame =TRUE) +
+tm_borders(alpha =0.5) +
+tm_compass(type="8star", size =2) +
+tm_scale_bar(width =0.15) +
+tm_grid(lwd =0.1, alpha =0.2) +
+tm_credits("Source: Planning Sub-zone boundary from Urban Redevelopment Authorithy (URA)\n and Population data from Department of Statistics DOS",
+             position = c("left","bottom"))
+```
+
+# Faceting the maps and custom view to show applicable area only
+
+```{r echo = TRUE}  
+
+tm_shape(mpsz_agemale2018) +
+  tm_fill("DEPENDENCY",
+          style = "quantile",
+          palette = "Blues",
+          thres.poly = 0) + 
+  tm_facets(by="REGION_N",
+            free.coords=TRUE,
+            drop.shapes=TRUE) +
+  tm_layout(legend.show = FALSE,
+            title.position = c("center",
+                               "center"), 
+            title.size = 20) +
+  tm_borders(alpha = 0.5)
 ```
 

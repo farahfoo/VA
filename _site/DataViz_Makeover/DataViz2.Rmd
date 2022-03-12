@@ -1,25 +1,39 @@
 ---
 title: "DataViz Makeover 2"
 description: |
-  A new article created using the Distill format.
+
+  Explore different perspectives and approaches to design more truthful and enlightening data visualisation to reveal inter- and intra-zonal public bus flows at the planning sub-zone level of January 2022.
+
 author:
-  - name: Nora Jones 
-    url: https://example.com/norajones
-    affiliation: Spacely Sprockets
-    affiliation_url: https://example.com/spacelysprokets
+  - name: Frostbear 
+    url: https://sg.linkedin.com/in/farahfoo
+    affiliation: SMU Masters in IT business (Fintech and Analytics)
+    affiliation_url: https://scis.smu.edu.sg/master-it-business
 date: "`r Sys.Date()`"
-output: distill::distill_article
+output: 
+  distill::distill_article:
+    toc: true
+    toc_depth: 4
+    toc_float: true
+    code_folding: FALSE
 ---
+
+# Task
+
+* Critic the data visualisation from its clarity, aesthetics and interactive design. At least three from each evaluation criterion. 
+
+* With reference to the critics above, suggest alternative graphical presentation to improve the current design. Sketch out the proposed design. The proposed alternative design should include appropriate interactive techniques. Support your design by describing the advantages or which part of the issue(s) your alternative design try to overcome. 
+
+* Using Tableau, design the proposed data visualisation. 
+
+* Provide step-by-step description on how the data visualisation was prepared.
+
+* Describe three major observations revealed by the data visualisation prepared. 
+
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
 ```
-
-Distill is a publication format for scientific and technical writing, native to the web. 
-
-Learn more about using Distill for R Markdown at <https://rstudio.github.io/distill>.
-
-
 
 
 

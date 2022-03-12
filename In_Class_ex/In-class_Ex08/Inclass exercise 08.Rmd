@@ -1,0 +1,26 @@
+---
+title: "In class exericse 08 "
+description: |
+  Learning network analysis. Networks are everywhere, it can refer to road maps, urban planning of bus nodes, inter and intra zonal transports, shipping routes, air flight routes, sewerage and water lines, social network
+author:
+  - name: Frostbear 
+    url: https://sg.linkedin.com/in/farahfoo
+    affiliation: SMU Masters in IT business (Fintech and Analytics)
+    affiliation_url: https://scis.smu.edu.sg/master-it-business
+date: "`r Sys.Date()`"
+output: 
+  distill::distill_article:
+    toc: true
+    toc_depth: 4
+    toc_float: true
+    code_folding: FALSE
+---
+
+# Examples of network
+
+![social network by Prof Kam](C:/farahfoo/VA/Pictures/social network.PNG)
+
+![Singapore flight by Prof Kam](C:/farahfoo/VA/Pictures/singapore flight network.PNG)
+
+![Project management network by Prof Kam](C:/farahfoo/VA/Pictures/project management network.PNG)
+
