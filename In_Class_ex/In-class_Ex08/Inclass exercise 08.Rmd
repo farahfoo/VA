@@ -24,3 +24,10 @@ output:
 
 ![Project management network by Prof Kam](C:/farahfoo/VA/Pictures/project management network.PNG)
 
+* Bipartite graph - A graph of analysis of executives to reveal the connections between the board of directors
+
+* Neo4j is a noSQL graph database, used to create graphical relational [database.](https://neo4j.com/developer/get-started/) 
+
+* [tidygraph](https://www.data-imaginist.com/2017/introducing-tidygraph/) is a Tidy API for graph manipulation. 
+
+
