@@ -55,5 +55,300 @@ Node size, Label, Shapes, Images, Border colour, Weight of line, line colour, li
 Network visualisation [basic attributes](C:/farahfoo/VA/Pictures/Network visualisation basic attributes.PNG)
 
 
-# In-class exercise
+# In-class exercise for Network using ggraph and tidygraph
+
+
+
+## Loading required packages
+
+tidygraph helps to build up the stats data for the network graph. visNetwork is Java scripted based, and provides interactivity for the visualisation. igraph is an old package and should be replaced with tidygraph. Lubriate handles date and Clock handles time.
+
+```{r echo = TRUE, message = FALSE}
+
+packages = c('tidygraph', 
+             'ggraph', 'visNetwork', 
+             'lubridate', 'clock',
+             'tidyverse')
+for (p in packages) {
+  if(!require(p,character.only = T)){
+    install.packages(p)
+  }
+  library(p,character.only = T)
+}
+```
+
+## Importing data files and preparing
+
+* Import and glimpse the format of data. 
+
+```{r echo = TRUE, message = FALSE}
+
+GAStech_nodes <- read_csv("data/GAStech_email_node.csv")
+GAStech_edges <- read_csv("data/GAStech_email_edge-v2.csv")
+
+glimpse(GAStech_edges)
+
+```
+
+* Sentdate should be date instead of character type. Use lubridate::dmy() and wday() to convert to date.
+
+```{r echo = TRUE, message = FALSE}
+
+GAStech_edges$SentDate  = dmy(GAStech_edges$SentDate)
+GAStech_edges$Weekday = wday(GAStech_edges$SentDate, 
+                             label = TRUE, 
+                             abbr = FALSE)
+
+# see the SentDate field has been changed to date and time format
+head(GAStech_edges, 3)
+
+```
+
+the Weekday has also been pulled out and factored levels in Ordinate scale
+
+* Filtering, Groupby and summarise transaction data
+
+```{r echo = TRUE, message = FALSE}
+
+GAStech_edges_aggregated <- GAStech_edges %>%
+  filter(MainSubject == "Work related") %>%
+  group_by(source, target, Weekday) %>%
+    summarise(Weight = n()) %>%
+  filter(source!=target) %>% #"!" filters away emails that employees send to themselves
+  filter(Weight > 1) %>% # filter out emails almost without content and are probably in error
+  ungroup()
+
+glimpse (GAStech_edges_aggregated)
+
+```
+
+## Graphing the dataset prepared
+
+* For network graphs, you define the nodes. A list and not a table will be created.
+
+```{r echo = TRUE, message = FALSE}
+
+GAStech_graph <- tbl_graph(nodes = GAStech_nodes,
+                           edges = GAStech_edges_aggregated, 
+                           directed = TRUE) # set directed to true if you want to display the direction
+
+GAStech_graph
+```
+
+* The nodes tibble data frame is activated by default, but you can change which tibble data frame is active with the activate() function. Below we activate by highest weight.
+
+```{r echo = TRUE, message = FALSE}
+
+GAStech_graph %>%
+  activate(edges) %>%
+  arrange(desc(Weight))
+```
+
+* A basic network graph. [ggraph](https://ggraph.data-imaginist.com/) is a twin of tidygraph and an extension of ggplot. Refer to the link for many graphs eg.treemap, hive, centrality. You determine the layout, nodes and then edges.
+
+```{r echo = TRUE, message = FALSE}
+ggraph(GAStech_graph) +
+  geom_edge_link() +
+  geom_node_point()
+```
+
+* remove the grey background using theme and adding some colour
+
+```{r echo = TRUE, message = FALSE}
+g <- ggraph(GAStech_graph) + 
+  geom_edge_link(aes(colour = 'grey50')) +
+  geom_node_point(aes(colour = 'grey40'))
+g + theme_graph(background = 'grey10',
+                text_colour = 'white')
+
+```
+
+## Playing with graph layouts. 
+
+```{r echo = TRUE, message = FALSE}
+g <- ggraph(GAStech_graph, 
+            layout = "fr") +
+  geom_edge_link(aes()) +
+  geom_node_point(aes())
+g + theme_graph()
+
+```
+
+### Colouring the nodes by department
+
+```{r echo = TRUE, message = FALSE}
+g <- ggraph(GAStech_graph, 
+            layout = "nicely") + 
+  geom_edge_link(aes()) +
+  geom_node_point(aes(colour = Department, 
+                      size = 3))
+g + theme_graph()
+
+```
+
+
+### Using the thickness of lines to show the weight variable
+
+```{r echo = TRUE, message = FALSE}
+g <- ggraph(GAStech_graph, 
+            layout = "nicely") +
+  geom_edge_link(aes(width=Weight), 
+                 alpha=0.2) +
+  scale_edge_width(range = c(0.1, 5)) +
+  geom_node_point(aes(colour = Department), 
+                  size = 3) +
+  theme(legend.position = 'bottom')
+
+g + theme_graph()
+```
+
+### Faceting edge (weekday). you can only Facet by the variable available, so edge for weekday, nodes for department in the next chart
+
+```{r echo = TRUE, message = FALSE}
+g <- ggraph(GAStech_graph, 
+            layout = "nicely") +
+  geom_edge_link(aes(width=Weight), 
+                 alpha=0.2) +
+  scale_edge_width(range = c(0.1, 5)) + #this defines the min and max thickness of the width of the line
+  geom_node_point(aes(colour = Department), 
+                  size = 3)
+
+g + facet_edges(~Weekday)+
+  th_foreground(foreground = "grey80",  
+                border = TRUE) +
+  theme(legend.position = 'bottom')
+```
+
+
+### Faceting nodes (department). you can only Facet by the variable available, so edge for weekday, nodes for department in the next chart
+
+```{r echo = TRUE, message = FALSE}
+g <- ggraph(GAStech_graph, 
+            layout = "nicely") +
+  geom_edge_link(aes(width=Weight), 
+                 alpha=0.2) +
+  scale_edge_width(range = c(0.1, 5)) + #this defines the min and max thickness of the width of the line
+  geom_node_point(aes(colour = Department), 
+                  size = 3)
+
+g + facet_nodes(~Department)+
+  th_foreground(foreground = "grey80",  
+                border = TRUE) +
+  theme(legend.position = 'bottom')
+```
+### Faceting nodes (department). you can only Facet by the variable available, so edge for weekday, nodes for department in the next chart
+
+```{r echo = TRUE, message = FALSE}
+g <- GAStech_graph %>%
+  mutate(betweenness_centrality = centrality_betweenness()) %>%
+  ggraph(layout = "fr") + 
+  geom_edge_link(aes(width=Weight), 
+                 alpha=0.2) +
+  scale_edge_width(range = c(0.1, 5)) +
+  geom_node_point(aes(colour = Department,
+            size=betweenness_centrality))
+g + theme_graph()
+
+```
+
+
+
+### Visualising Community using the same colour / node point
+
+```{r echo = TRUE, message = FALSE}
+g <- GAStech_graph %>%
+  mutate(community = as.factor(group_edge_betweenness(weights = Weight, directed = TRUE))) %>%
+  ggraph(layout = "fr") + 
+  geom_edge_link(aes(width=Weight), 
+                 alpha=0.2) +
+  scale_edge_width(range = c(0.1, 5)) +
+  geom_node_point(aes(colour = community))  
+g + theme_graph()
+
+```
+
+
+# Building Interactive Network Graph with visNetwork
+
+*creating a new aggregate table that shows the from and to field. Viznetwork has a rigid network structure, only recognises the column name "from" and "to", so the data columns need to be renamed as well. 
+
+```{r echo = TRUE, message = FALSE}
+GAStech_edges_aggregated <- GAStech_edges %>%
+  left_join(GAStech_nodes, by = c("sourceLabel" = "label")) %>%
+  rename(from = id) %>%
+  left_join(GAStech_nodes, by = c("targetLabel" = "label")) %>%
+  rename(to = id) %>%
+  filter(MainSubject == "Work related") %>%
+  group_by(from, to) %>%
+    summarise(weight = n()) %>%
+  filter(from!=to) %>%
+  filter(weight > 1) %>%
+  ungroup()
+
+glimpse (GAStech_edges_aggregated)
+
+```
+* animating the graph
+
+```{r echo = TRUE, message = FALSE}
+visNetwork(GAStech_nodes, 
+           GAStech_edges_aggregated)
+
+```
+
+* static layout with zoom function
+
+```{r echo = TRUE, message = FALSE}
+visNetwork(GAStech_nodes,
+           GAStech_edges_aggregated) %>%
+  visIgraphLayout(layout = "layout_with_fr")
+```
+
+* assigning unique colour to each category in the group field. So the data needs to have "from", "to" and "group" variable name
+
+```{r echo = TRUE, message = FALSE}
+GAStech_nodes <- GAStech_nodes %>%
+  rename(group = Department)
+
+visNetwork(GAStech_nodes,
+           GAStech_edges_aggregated) %>%
+  visIgraphLayout(layout = "layout_with_fr") %>%
+  visLegend() %>%
+  visLayout(randomSeed = 123)
+```
+
+* run below visEdges() is used to symbolise the edges. The argument arrows is used to define where to place the arrow. The smooth argument is used to plot the edges using a smooth curve.
+
+```{r echo = TRUE, message = FALSE}
+
+visNetwork(GAStech_nodes,
+           GAStech_edges_aggregated) %>%
+  visIgraphLayout(layout = "layout_with_fr") %>%
+  visEdges(arrows = "to", 
+           smooth = list(enabled = TRUE, 
+                         type = "curvedCW")) %>%
+  visLegend() %>%
+  visLayout(randomSeed = 123)
+```
+
+## Visualising Flows Between Entities: Chord Diagram method
+
+```{r echo = TRUE, message = FALSE}
+
+packages = c('circlize', 
+             'chorddiag')
+for (p in packages) {
+  if(!require(p,character.only = T)){
+    install.packages(p)
+  }
+  library(p,character.only = T)
+}
+
+mig_data <- read_csv("data/bilateral_migration2017.csv")
+
+```
+
+run devtools::install_github("mattflor/chorddiag/") to install this as it is not readily available in R cran
+
+continue from notess............
 
