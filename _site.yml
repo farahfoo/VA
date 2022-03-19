@@ -4,6 +4,9 @@ description: |
   ISSS608 assignments and homework
 output_dir: "_site"
 navbar:
+  logo:
+    image: images/logo.png
+  search: true
   right:
     - text: "Home"
       href: index.html

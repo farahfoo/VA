@@ -20,15 +20,21 @@ output:
 
 # Task
 
-* Critic the data visualisation from its clarity, aesthetics and interactive design. At least three from each evaluation criterion. 
+* *1. Critic the data visualisation from its clarity, aesthetics and interactive design. At least three from each evaluation criterion. *
 
-* With reference to the critics above, suggest alternative graphical presentation to improve the current design. Sketch out the proposed design. The proposed alternative design should include appropriate interactive techniques. Support your design by describing the advantages or which part of the issue(s) your alternative design try to overcome. 
+```{r, echo = FALSE, out.width = "1300px", out.height="400px"}
+knitr::include_graphics("C:/farahfoo/VA/Pictures/dataviz2critique.PNG")
+```
 
-* Using Tableau, design the proposed data visualisation. 
 
-* Provide step-by-step description on how the data visualisation was prepared.
 
-* Describe three major observations revealed by the data visualisation prepared. 
+* *2. With reference to the critics above, suggest alternative graphical presentation to improve the current design. Sketch out the proposed design. The proposed alternative design should include appropriate interactive techniques. Support your design by describing the advantages or which part of the issue(s) your alternative design try to overcome. *
+
+* *3. Using Tableau, design the proposed data visualisation. *
+
+* *4. Provide step-by-step description on how the data visualisation was prepared.*
+
+* *5. Describe three major observations revealed by the data visualisation prepared.* 
 
 
 ```{r setup, include=FALSE}
