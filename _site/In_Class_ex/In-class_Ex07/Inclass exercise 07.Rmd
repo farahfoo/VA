@@ -1,7 +1,7 @@
 ---
 title: "In class exericse 07 "
 description: |
-  Time series
+  Mapping Geospatial
 author:
   - name: Frostbear 
     url: https://sg.linkedin.com/in/farahfoo

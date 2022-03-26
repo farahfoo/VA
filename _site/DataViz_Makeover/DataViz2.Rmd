@@ -18,28 +18,128 @@ output:
     code_folding: FALSE
 ---
 
-# Task
+# 1. Critique Task
 
-* *1. Critic the data visualisation from its clarity, aesthetics and interactive design. At least three from each evaluation criterion. *
+Critic the [data visualisation](https://public.tableau.com/app/profile/tskam/viz/prototype1_16468762782120/Dashboard1) from its clarity, aesthetics and interactive design. At least three from each evaluation criterion.
 
-```{r, echo = FALSE, out.width = "1300px", out.height="400px"}
-knitr::include_graphics("C:/farahfoo/VA/Pictures/dataviz2critique.PNG")
-```
+![bus trips](C:/farahfoo/VA/Pictures/dataviz2critique.PNG)
 
+## 1.1 Clarity
 
+* User is not able to identify which is Origin is the most popular for a selected destination and vice versa.  
 
-* *2. With reference to the critics above, suggest alternative graphical presentation to improve the current design. Sketch out the proposed design. The proposed alternative design should include appropriate interactive techniques. Support your design by describing the advantages or which part of the issue(s) your alternative design try to overcome. *
+* Difficult to compare weekday and weekend travel numbers as they are in different graphs
 
-* *3. Using Tableau, design the proposed data visualisation. *
+* Users are not able to guage the distance of the origins and destinations and direction, if they are not familar with the map of Singapore
 
-* *4. Provide step-by-step description on how the data visualisation was prepared.*
-
-* *5. Describe three major observations revealed by the data visualisation prepared.* 
+* The dashboard is not labelled properly to indicate what is this dashboard about.
 
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE)
-```
+## 1.2 Aesthetics
+
+* 6 charts in a screen is too many and confusing.
+
+* The weekday and weekend adjacency matrix is not useful as it is too small for any reading and interpretation.
+
+* There are axis labels and chart titles, however a user must still think about what the visualisation is trying to say and how it can be used. There is insufficient explanation for a user to understand how to use the visualisation.
 
 
+## 1.3 Interactive Design
+
+* The display does not allow analysis by region eg. Central, east etc. This information is valuable for cross-town analysis
+
+* Selection of location does not allow multi-select.
+
+* The selection of locations option is too far from the graph that changes
+
+
+# 2. Proposed Design
+
+The initial sketch of the proposed design is as follow. The final chart may have slight differences as improvements are made when the visualisation is created in Tableau.
+
+![Sketch for revised visualisation](C:/farahfoo/VA/DataViz_Makeover/DataViz2 pictures/chart sketch.jpg)
+
+
+## 2.1 Clarity
+
+* The proposed chart seeks to make dashboard more use friendly to investigate bus trips between towns in Singapore. Since the bus trips are 2 way and can be investigated either by destination or origin, to avoid confusion, the visualisation will be broken up into 2 dashboard to make it easier for user explore and investigate without getting confused.
+
+* Proposed design will have 1 map of Singapore as a clear visualisation of the area and location of the town, which helps users who are not familiar with the location of all the Singapore's towns.
+
+* To help users to use the visualisation, instructions will be included at the top of the visualisation
+
+* The peak volumes by hour of the day can be clearly seen from the chart "Peak period (hr) of travel to All" with the clear header and and intensity of the colour.
+
+
+## 2.2 Aesthetics
+
+* The dashboard will have clear and information titles to let users understand how the dashboard works. 
+
+* Wordings and visualisation, selections will be well spaced out for easy reading
+
+* The map uses colour scaling to reflect the different volumes of trips, so that at once glance it is easy to see which area has higher volumes than others.
+
+
+## 2.3 Interactive Design
+
+* The selection of towns is made as multi-select so that users can analyse multiple towns as desired. 
+
+* With the map, users can easily click on the dark or light tones, or they can use their mouse to drag-select an area which they may be interested to investigate, without needing to know the name of the town / region.
+
+* Users are able to filter out low volumes of trips in the ""Peak period (hr) of travel to All" chart if they only want to focus on those with high volumes.
+
+# 3. Visualisation on Tableau
+
+Pls view the revised visualisation on Tableau Public [here](https://public.tableau.com/app/profile/frostbear/viz/SingaporeBustripsAnalysis/OriginDashboard?publish=yes)
+
+![Revised visualisation in Tableau](C:/farahfoo/VA/DataViz_Makeover/DataViz2 pictures/revised visualisation.png)
+
+# 4. Step-By-Step Preparation
+
+**4.1** Load the .csv file "origin_destination_bus__SZ_202201" and the "MP14_SUBZONE_WEB_PL.shp" xls file into Tableau as data source. Link the 2 files by the key fields Destination Sz with SUBZONEM, and Origin Sz with SUBZONEN.
+
+![](C:/farahfoo/VA/DataViz_Makeover/DataViz2 pictures/Picture1.png)
+![](C:/farahfoo/VA/DataViz_Makeover/DataViz2 pictures/Picture2.png)
+![](C:/farahfoo/VA/DataViz_Makeover/DataViz2 pictures/Picture3.png)
+
+
+**4.2** Open a new tab/chart and drag the field "Geometry (Mp14 Subzone ...)" from the Destination Map source to form the base map chart. 
+![](C:/farahfoo/VA/DataViz_Makeover/DataViz2 pictures/Picture4.png)
+
+**4.3** Next to put in colour scaling to represent the number of trips, 
+* select the field "Total Trips" from the Origin destination file to the Colour feature. 
+* select the field " Origin Sz" from the origin destination file to the Detail feature of tableau. 
+
+By default, the higher the number of trips in the darker the colour. 
+
+![](C:/farahfoo/VA/DataViz_Makeover/DataViz2 pictures/Picture5.png)
+
+**4.4** Add in the "Destination Region" and " Destination" fields from the origin destination file to the filter box to enable users to select the town they are interested in. Ensure the selection is boxes, to enable multi-select of the region and towns. 
+
+![](C:/farahfoo/VA/DataViz_Makeover/DataViz2 pictures/Picture6.png)
+Edit the title as below to ensure the chart is clear to the reader that it is showing where the visitors are from to the Destination planning area. Bond the <Destination PA> font and change it to blue to make it obvious to readers in the title.
+![](C:/farahfoo/VA/DataViz_Makeover/DataViz2 pictures/Picture8.png)
+
+**4.5** Open a new tab for the visualisation of number of trips by origin and input the fields as below in the picture. 
+* Adjust the size of the circle to the middle size. 
+* Ensure the title has a clear description and mentions the selection destination
+
+![](C:/farahfoo/VA/DataViz_Makeover/DataViz2 pictures/Picture7.png)
+
+
+**4.6** Open a new tab for the visualisation of the hours data. This visualisation will show at which time of the day there are more bus trips.
+* select the shown fields into the row, column, filter and detail.
+
+![](C:/farahfoo/VA/DataViz_Makeover/DataViz2 pictures/Picture9.png)
+* Check that it is working with different selections. eg. when selecting Paya Lebar, you should be able to see that the bubble to Tampines East at 7am has a big red box, indicating that the number of bus trips from there is more than others.
+
+* Update the chart title to insert the <Destination PA> variable as well.
+
+![](C:/farahfoo/VA/DataViz_Makeover/DataViz2 pictures/Picture10.png)
+
+**4.7** Open a Dashboard page and pull the 3 charts created: map chart, the number of trips chart peak hour chart, into a dashboard page. 
+
+* At the top of the dashboard, add a text field and key in the instructions for using the dashboard.  
+
+![](C:/farahfoo/VA/DataViz_Makeover/DataViz2 pictures/Picture11.png)
 

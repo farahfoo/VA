@@ -65,7 +65,7 @@ The data visualisation is created by using data provided by Ministrty of Manpowe
 
 # 2. Proposed Design
 
-The initial sketch of the proposed design is as follow. The final chart may have slight differences as imrpovements are made when the visualisation is created in Tableau.
+The initial sketch of the proposed design is as follow. The final chart may have slight differences as improvements are made when the visualisation is created in Tableau.
 
 ![Sketch for revised visualisation](C:/farahfoo/VA/DataViz_Makeover/DataViz1 pictures/chart sketch.jpg)
 
@@ -73,7 +73,7 @@ The initial sketch of the proposed design is as follow. The final chart may have
 
 * The proposed chart uses a line chart and will show the trend of age groups across the years clearly as it allows for comparison across the age groups, instead of an area chart.
 
-* The Y axis will have a proper name, and the x-axis name will/may be removed since the axis label is inituitive enough
+* The Y axis will have a proper name, and the x-axis name will/may be removed since the axis label is intuitive enough
 
 * Any insight will have a clear label on the chart to draw reader's attention to the main point. 
 
