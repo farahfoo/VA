@@ -9,3 +9,11 @@ This webpage consist of a demonstration of my in-class and take-home exercises a
 
 In-class exercises are mostly performed using Tableau.
 Take home exercises are to replicate the same charts using R
+
+My name is Frostbear ~ Farah Foo
+
+Url: https://sg.linkedin.com/in/farahfoo
+
+Affiliation: SMU Masters in IT business (Fintech and Analytics)
+
+Affiliation_url: https://scis.smu.edu.sg/master-it-business
