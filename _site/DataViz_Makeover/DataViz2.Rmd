@@ -143,3 +143,7 @@ Edit the title as below to ensure the chart is clear to the reader that it is sh
 
 ![](C:/farahfoo/VA/DataViz_Makeover/DataViz2 pictures/Picture11.png)
 
+**4.7** The Origin Analysis Dashboard link will bring users to another visualisation for the user to explore the data, bit from the origination of the bus trip perspective, studying where are people from eg. Ang Mo Kio going to. 
+
+![](C:/farahfoo/VA/DataViz_Makeover/DataViz2 pictures/Picture12.png)
+
